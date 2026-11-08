@@ -115,5 +115,5 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.json:json:20231013")   // JVM ইউনিট টেস্টে org.json (অ্যান্ড্রয়েডে বিল্ট-ইন)
+    testImplementation("org.json:json:20260814")   // JVM ইউনিট টেস্টে org.json (অ্যান্ড্রয়েডে বিল্ট-ইন)
 }
