@@ -13,7 +13,9 @@ import com.tubex.app.util.L
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.schabi.newpipe.extractor.Page
@@ -65,11 +67,16 @@ class OnlinePlaylistController(
     var loading by mutableStateOf(false); private set
     var moreLoading by mutableStateOf(false); private set
 
+    private var openJob: Job? = null
+
     fun open(url: String) {
         isOpen = true; data = null
-        scope.launch {
+        openJob?.cancel()   // দ্রুত দুটো প্লেলিস্টে ট্যাপ করলে আগেরটার ফলাফল পরেরটার ওপর বসবে না
+        openJob = scope.launch {
             loading = true
-            try { data = YtRepository.playlist(url) } catch (e: Exception) { /* স্ক্রিনে "লোড করা যায়নি" দেখায় */ }
+            try { data = YtRepository.playlist(url) }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) { /* স্ক্রিনে "লোড করা যায়নি" দেখায় */ }
             loading = false
         }
     }

@@ -1,0 +1,18 @@
+TubeX is a YouTube client for Android built with Jetpack Compose, Media3 and NewPipe Extractor. No Google account, no ads, no analytics.
+
+<b>Playback</b>
+• Quality switching, background playback, Picture-in-Picture, Cast
+• Playback speed, chapters, subtitles with size/color/background options
+• SponsorBlock, DeArrow, Return YouTube Dislike
+• Gestures for seek, volume and brightness, sleep timer, audio-only mode
+
+<b>On-device recommendations</b>
+• Learns from what you watch, skip and like, entirely on your phone
+• Weekday/weekend and time-of-day patterns, topic variety
+• Dashboard: see what it knows and why a video was suggested; export, reduce or wipe it
+
+<b>Library</b>
+• History, favorites, playlists, subscriptions, continue watching, downloads
+• Import from NewPipe, back up your profile
+
+11 themes, Bengali and English interface. Free software under GPL-3.0.

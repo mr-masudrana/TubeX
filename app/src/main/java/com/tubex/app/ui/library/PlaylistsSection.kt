@@ -42,6 +42,21 @@ internal fun PlaylistSection(vm: MainViewModel) {
         return
     }
     renaming?.let { r -> RenameDialog(r.name, onDismiss = { renaming = null }) { vm.renamePlaylist(r.id, it); renaming = null } }
+    // এক ট্যাপে পুরো প্লেলিস্ট (ও তার সব আইটেম) মুছে যাওয়া ঠেকাতে নিশ্চিতকরণ
+    var deleting by remember { mutableStateOf<PlaylistRow?>(null) }
+    deleting?.let { d ->
+        AlertDialog(
+            onDismissRequest = { deleting = null },
+            title = { Text(L.f("\"{0}\" মুছবেন?", d.name)) },
+            text = { Text(L.t("প্লেলিস্ট ও এর সব ভিডিও তালিকা থেকে মুছে যাবে। এটা আর ফেরানো যাবে না।")) },
+            confirmButton = {
+                TextButton(onClick = { vm.deletePlaylist(d.id); deleting = null }) {
+                    Text(L.t("মুছুন"), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = { TextButton(onClick = { deleting = null }) { Text(L.t("বাতিল")) } }
+        )
+    }
     Column {
         Row(Modifier.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
@@ -75,7 +90,7 @@ internal fun PlaylistSection(vm: MainViewModel) {
                         Text(L.f("{0} টি ভিডিও", p.itemCount), color = Sub, fontSize = 12.sp)
                     }
                     IconButton(onClick = { renaming = p }) { Icon(Icons.Filled.Edit, null) }
-                    IconButton(onClick = { vm.deletePlaylist(p.id) }) { Icon(Icons.Filled.Delete, null) }
+                    IconButton(onClick = { deleting = p }) { Icon(Icons.Filled.Delete, null) }
                 }
             }
         }

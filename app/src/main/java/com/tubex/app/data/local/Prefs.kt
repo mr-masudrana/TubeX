@@ -13,6 +13,11 @@ class Prefs(ctx: Context) {
         get() = sp.getBoolean("sponsorblock", true)
         set(v) { sp.edit().putBoolean("sponsorblock", v).apply() }
 
+    /** SponsorBlock-এ যে ক্যাটাগরিগুলো বাদ যাবে (কমা-বিভক্ত); ডিফল্ট = filler ছাড়া বাকি সব */
+    var sponsorCats: String
+        get() = sp.getString("sponsorCats", null) ?: "sponsor,selfpromo,interaction,intro,outro"
+        set(v) { sp.edit().putString("sponsorCats", v).apply() }
+
     /** YouTube-এর যাচাই টোকেন (BotGuard poToken): ভিডিও না চলা/"বট" সমস্যা কমায় */
     var poToken: Boolean
         get() = sp.getBoolean("potoken", true)

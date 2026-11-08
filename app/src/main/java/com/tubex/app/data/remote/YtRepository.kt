@@ -84,7 +84,7 @@ object YtRepository {
         SearchInfo.getInfo(yt, handler).relatedItems.filterIsInstance<PlaylistInfoItem>().take(limit).map { it.toEntry() }
     }
 
-    suspend fun streamInfo(url: String): StreamInfo = withContext(Dispatchers.IO) { StreamInfo.getInfo(yt, url) }
+    suspend fun streamInfo(url: String): StreamInfo = withContext(Dispatchers.IO) { Retry.withBackoff { StreamInfo.getInfo(yt, url) } }
 
     fun related(info: StreamInfo): List<VideoItem> =
         info.relatedItems.filterIsInstance<StreamInfoItem>().map { it.toVideo() }

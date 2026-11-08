@@ -103,8 +103,21 @@ fun VideoCard(v: VideoItem, onChannel: () -> Unit = {}, onClick: () -> Unit) {
     if (showWhy) AlertDialog(
         onDismissRequest = { showWhy = false },
         title = { Text(L.t("কেন সাজেস্ট হলো?")) },
-        text = { Text(v.reason ?: "") },
-        confirmButton = { TextButton(onClick = { showWhy = false }) { Text(L.t("ঠিক আছে")) } }
+        text = {
+            Column {
+                // সবচেয়ে জোরালো কারণগুলো (থাকলে); না থাকলে একটি সারসংক্ষেপ-কারণ
+                val reasons = v.why.ifEmpty { listOfNotNull(v.reason) }
+                reasons.forEach { Text("• $it", modifier = Modifier.padding(vertical = 2.dp)) }
+                Text(
+                    L.t("এই সাজেশন শুধু এই ফোনে, আপনার দেখার ধরন থেকে তৈরি। সেটিংস → রিকমেন্ডেশন প্রোফাইল থেকে বদলাতে পারেন।"),
+                    fontSize = 12.sp, color = Sub, modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+        },
+        confirmButton = { TextButton(onClick = { showWhy = false }) { Text(L.t("ঠিক আছে")) } },
+        dismissButton = if (vm != null) {
+            { TextButton(onClick = { showWhy = false; vm.notInterested(v) }) { Text(L.t("আগ্রহ নেই")) } }
+        } else null
     )
 
     if (showKw && vm != null) {

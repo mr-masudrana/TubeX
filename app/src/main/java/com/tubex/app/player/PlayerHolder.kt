@@ -77,6 +77,7 @@ object PlayerHolder {
                 .build(), true
         )
         .setHandleAudioBecomingNoisy(true)
+        .setWakeMode(C.WAKE_MODE_NETWORK)   // স্ক্রিন বন্ধ থাকলেও প্লেব্যাকের সময় CPU + ওয়াইফাই জাগিয়ে রাখে
         // দ্রুত শুরু: ১ সেকেন্ড বাফার হলেই চালু (ডিফল্ট ২.৫ সে), বাফারিং-এর পর ২ সেকেন্ডে ফেরা
         .setLoadControl(
             DefaultLoadControl.Builder()

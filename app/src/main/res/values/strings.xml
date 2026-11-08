@@ -1,3 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TubeX</string>
+    <string name="app_name" translatable="false">TubeX</string>
+    <!-- কিউ UI ও রিকমেন্ডেশন ড্যাশবোর্ড -->
+    <string name="all_data_stays_on_this_phone" formatted="false">All data stays on this phone. See what the app has learned about you — and change it if you like.</string>
+    <string name="topics" formatted="false">Topics</string>
+    <string name="blocked" formatted="false">Blocked</string>
+    <string name="nothing_learned_yet_watch_a_few" formatted="false">Nothing learned yet — watch a few videos or search.</string>
+    <string name="when_you_watch_what" formatted="false">When you watch what</string>
+    <string name="your_tastes_differ_by_weekday_weekend" formatted="false">Your tastes differ by weekday/weekend and time of day. Tap a cell.</string>
+    <string name="not_enough_data_for_this_time" formatted="false">{0}: not enough data for this time yet.</string>
+    <string name="str_008" formatted="false">{0}: {1}</string>
+    <string name="favorite_channels" formatted="false">Favorite channels</string>
+    <string name="favorite_topics" formatted="false">Favorite topics</string>
+    <string name="shown_less_right_now" formatted="false">Shown less right now</string>
+    <string name="boredom_appeared_4_times_in_your" formatted="false">Boredom: appeared 4+ times in your last 10 videos, so shown less for now:</string>
+    <string name="not_interested" formatted="false">Not interested: {0}</string>
+    <string name="restore_to_normal" formatted="false">Restore to normal</string>
+    <string name="hide" formatted="false">Hide</string>
+    <string name="how_does_the_app_learn" formatted="false">How does the app learn?</string>
+    <string name="watching_50_90_of_a_video" formatted="false">• Watching 50%/90% of a video raises the score; skipping quickly lowers it</string>
+    <string name="it_also_learns_from_favorites_subscripti" formatted="false">• It also learns from favorites, subscriptions and searches</string>
+    <string name="not_interested_lowers_that_topic_channel" formatted="false">• \"Not interested\" lowers that topic/channel\'s score</string>
+    <string name="scores_halve_every_14_days_so" formatted="false">• Scores halve every 14 days, so old interests fade gradually</string>
+    <string name="watching_the_same_topic_repeatedly_shows" formatted="false">• Watching the same topic repeatedly shows it less for a while, so the feed stays fresh</string>
+    <string name="video_card_why_suggested_shows_the" formatted="false">• Video card ⋮ → \"Why suggested?\" shows the reason for each suggestion</string>
+    <string name="channel" formatted="false">Channel {0}</string>
+    <string name="afternoon" formatted="false">Afternoon</string>
+    <string name="current_time" formatted="false">• = current time</string>
+    <string name="show_less" formatted="false">Show less</string>
+    <string name="forget" formatted="false">Forget</string>
+    <string name="videos" formatted="false">{0} videos</string>
+    <string name="hold_drag_to_reorder_swipe_to" formatted="false">⠿ hold &amp; drag to reorder, swipe to remove</string>
+    <string name="drag_to_reorder" formatted="false">Drag to reorder</string>
+    <string name="removed" formatted="false">“{0}” removed</string>
+    <string name="undo" formatted="false">Undo</string>
+    <string name="this_suggestion_is_made_on_this" formatted="false">This suggestion is made on this phone from your viewing habits. Change it in Settings → Recommendation profile.</string>
+    <string name="new_upload" formatted="false">New upload</string>
+    <string name="forgotten" formatted="false">Forgotten</string>
+    <string name="influence_reduced" formatted="false">Influence reduced</string>
+    <string name="couldn_t_load_channel" formatted="false">Couldn\'t load channel</string>
+    <string name="subscribed" formatted="false">Subscribed</string>
+    <string name="subscribe" formatted="false">Subscribe</string>
+    <string name="video" formatted="false">Video</string>
+    <string name="audio_stream_not_found" formatted="false">Audio stream not found</string>
+    <string name="video_stream_not_found" formatted="false">Video stream not found</string>
+    <string name="empty_response" formatted="false">Empty response</string>
+    <string name="couldn_t_determine_file_size" formatted="false">Couldn\'t determine file size</string>
+    <string name="download_stalled" formatted="false">Download stalled</string>
+    <string name="downloading" formatted="false">Downloading</string>
+    <string name="download" formatted="false">Download</string>
+    <string name="video_audio_merged" formatted="false">Video + audio merged</string>
+    <string name="webm_video_audio_merged" formatted="false">WebM • video + audio merged</string>
+    <string name="mp4_av1_smaller_file_merged" formatted="false">MP4 • AV1 • smaller file, merged</string>
+    <string name="direct_no_merge" formatted="false">Direct (no merge)</string>
+    <string name="audio_only" formatted="false">Audio only</string>
+    <string name="this_is_already_in_the_download" formatted="false">This is already in the download list</string>
+    <string name="s" formatted="false">" s"</string>
+    <string name="more_settings" formatted="false">More settings</string>
+    <string name="you_haven_t_subscribed_to_any" formatted="false">You haven\'t subscribed to any channels yet</string>
+    <string name="refresh" formatted="false">Refresh</string>
+    <string name="history" formatted="false">History</string>
+    <string name="favorites" formatted="false">Favorites</string>
+    <string name="playlists" formatted="false">Playlists</string>
+    <string name="history_is_empty" formatted="false">History is empty</string>
+    <string name="no_favorites" formatted="false">No favorites</string>
+    <string name="new_playlist" formatted="false">New playlist</string>
+    <string name="create" formatted="false">Create</string>
+    <string name="no_playlists" formatted="false">No playlists</string>
+    <string name="videos_2" formatted="false">{0} videos</string>
+    <string name="play_all" formatted="false">Play all</string>
+    <string name="shuffle" formatted="false">Shuffle</string>
+    <string name="playlist_is_empty_add_videos_from" formatted="false">Playlist is empty — add videos from the video page</string>
+    <string name="no_downloads" formatted="false">No downloads</string>
+    <string name="pause_all" formatted="false">Pause all</string>
+    <string name="start_all" formatted="false">Start all</string>
+    <string name="audio" formatted="false">Audio</string>
+    <string name="waiting_in_queue" formatted="false">Waiting in queue</string>
+    <string name="downloading_2" formatted="false">Downloading {0}%</string>
+    <string name="paused" formatted="false">Paused ({0}%)</string>
+    <string name="done" formatted="false">Done</string>
+    <string name="file_not_found" formatted="false">File not found</string>
+    <string name="merging" formatted="false">Merging…</string>
+    <string name="failed_try_again" formatted="false">Failed — try again</string>
+    <string name="sleep_timer_playback_stopped" formatted="false">Sleep timer: playback stopped</string>
+    <string name="playback_error" formatted="false">Playback error</string>
+    <string name="sponsor_segment_skipped" formatted="false">Sponsor segment skipped</string>
+    <string name="couldn_t_load" formatted="false">Couldn\'t load</string>
+    <string name="no_videos_found" formatted="false">No videos found</string>
+    <string name="added_to_queue" formatted="false">Added to queue</string>
+    <string name="couldn_t_play_the_video" formatted="false">Couldn\'t play the video</string>
+    <string name="hidden" formatted="false">Hidden</string>
+    <string name="check_started_the_first_time_current" formatted="false">Check started. The first time, current videos are only marked as \"seen\".</string>
+    <string name="this_video_can_t_be_cast" formatted="false">This video can\'t be cast</string>
+    <string name="profile_reset" formatted="false">Profile reset</string>
+    <string name="history_cleared" formatted="false">History cleared</string>
+    <string name="already_added" formatted="false">Already added</string>
+    <string name="added_to_playlist" formatted="false">Added to playlist</string>
+    <string name="imported_channels_and_history_items" formatted="false">Imported {0} channels and {1} history items</string>
+    <string name="imported_channels" formatted="false">Imported {0} channels</string>
+    <string name="import_failed" formatted="false">Import failed: {0}</string>
+    <string name="newpipe_db_not_found_in_the" formatted="false">newpipe.db not found in the ZIP</string>
+    <string name="profile_exported" formatted="false">Profile exported</string>
+    <string name="export_failed" formatted="false">Export failed: {0}</string>
+    <string name="this_is_not_a_tubex_profile" formatted="false">This is not a TubeX profile file</string>
+    <string name="profile_imported" formatted="false">Profile imported</string>
+    <string name="added_to_download_queue" formatted="false">Added to download queue</string>
+    <string name="download_failed" formatted="false">Download failed</string>
+    <string name="video_audio_track_not_found" formatted="false">Video/audio track not found</string>
+    <string name="new_video" formatted="false">New video</string>
+    <string name="new_videos" formatted="false">{0} new videos</string>
+    <string name="subtitles" formatted="false">Subtitles</string>
+    <string name="small" formatted="false">Small</string>
+    <string name="medium" formatted="false">Medium</string>
+    <string name="large" formatted="false">Large</string>
+    <string name="color" formatted="false">Color</string>
+    <string name="white" formatted="false">White</string>
+    <string name="yellow" formatted="false">Yellow</string>
+    <string name="green" formatted="false">Green</string>
+    <string name="blue" formatted="false">Blue</string>
+    <string name="background" formatted="false">Background</string>
+    <string name="none" formatted="false">None</string>
+    <string name="semi_transparent" formatted="false">Semi-transparent</string>
+    <string name="black" formatted="false">Black</string>
+    <string name="off" formatted="false">Off</string>
+    <string name="just_now" formatted="false">Just now</string>
+    <string name="min_ago" formatted="false">{0} min ago</string>
+    <string name="hr_ago" formatted="false">{0} hr ago</string>
+    <string name="days_ago" formatted="false">{0} days ago</string>
+    <string name="mo_ago" formatted="false">{0} mo ago</string>
+    <string name="yr_ago" formatted="false">{0} yr ago</string>
+    <string name="views" formatted="false">{0} views</string>
+    <string name="subscribers" formatted="false">{0} subscribers</string>
+    <string name="description" formatted="false">Description</string>
+    <string name="views_2" formatted="false">Views</string>
+    <string name="likes" formatted="false">Likes</string>
+    <string name="dislikes" formatted="false">Dislikes</string>
+    <string name="published" formatted="false">Published</string>
+    <string name="no_description" formatted="false">No description</string>
+    <string name="more" formatted="false">...more</string>
+    <string name="muted" formatted="false">Muted</string>
+    <string name="unmuted" formatted="false">Unmuted</string>
+    <string name="autoplay_on" formatted="false">Autoplay: On</string>
+    <string name="autoplay_off" formatted="false">Autoplay: Off</string>
+    <string name="auto_generated" formatted="false">" (auto-generated)"</string>
+    <string name="offline_downloaded" formatted="false">Offline (downloaded)</string>
+    <string name="add_to_playlist" formatted="false">Add to playlist</string>
+    <string name="queue" formatted="false">Queue</string>
+    <string name="share" formatted="false">Share</string>
+    <string name="share_channel" formatted="false">Share channel</string>
+    <string name="couldn_t_load_playlist" formatted="false">Couldn\'t load playlist</string>
+    <string name="save_to_library" formatted="false">Save to library</string>
+    <string name="saving" formatted="false">Saving…</string>
+    <string name="saved_to_library" formatted="false">\"{0}\" saved to library</string>
+    <string name="youtube_playlist_link" formatted="false">YouTube playlist link</string>
+    <string name="open_link" formatted="false">Open link</string>
+    <string name="copy_link" formatted="false">Copy link</string>
+    <string name="link_copied" formatted="false">Link copied</string>
+    <string name="open_in_browser" formatted="false">Open in browser</string>
+    <string name="chapters" formatted="false">Chapters</string>
+    <string name="related_to_what_you_watched_recently" formatted="false">Related to what you watched recently</string>
+    <string name="comments" formatted="false">Comments</string>
+    <string name="loading" formatted="false">Loading…</string>
+    <string name="no_comments_or_comments_are_turned" formatted="false">No comments, or comments are turned off</string>
+    <string name="add_to_playlist_2" formatted="false">Add to playlist</string>
+    <string name="items" formatted="false">{0} items</string>
+    <string name="playback_speed" formatted="false">Playback speed</string>
+    <string name="video_quality" formatted="false">Video quality</string>
+    <string name="sleep_timer" formatted="false">Sleep timer</string>
+    <string name="end_of_video" formatted="false">End of video</string>
+    <string name="min" formatted="false">{0} min</string>
+    <string name="on_stops_in_about_minutes" formatted="false">On — stops in about {0} minutes</string>
+    <string name="repeat" formatted="false">Repeat</string>
+    <string name="one_video" formatted="false">One video</string>
+    <string name="plays_random_videos_from_the_queue" formatted="false">Plays random videos from the queue</string>
+    <string name="plays_without_video_saves_data" formatted="false">Plays without video, saves data</string>
+    <string name="skip_silence" formatted="false">Skip silence</string>
+    <string name="skips_silent_gaps_in_speech" formatted="false">Skips silent gaps in speech</string>
+    <string name="no_download_options_available" formatted="false">No download options available</string>
+    <string name="queue_is_empty_use_play_next" formatted="false">Queue is empty. Use \"Play next\" or \"Add to queue\" from a video card\'s ⋮ menu.</string>
+    <string name="clear_queue" formatted="false">Clear queue</string>
+    <string name="weekend" formatted="false">Weekend</string>
+    <string name="weekday" formatted="false">Weekday</string>
+    <string name="morning" formatted="false">Morning</string>
+    <string name="afternoon_2" formatted="false">Afternoon</string>
+    <string name="evening" formatted="false">Evening</string>
+    <string name="night" formatted="false">Night</string>
+    <string name="you_often_watch_the_channel" formatted="false">You often watch the \"{0}\" channel</string>
+    <string name="your_pick_at_this_time" formatted="false">Your pick at this time ({0}): {1}</string>
+    <string name="a_topic_you_re_interested_in" formatted="false">A topic you\'re interested in: {0}</string>
+    <string name="a_channel_you_subscribe_to" formatted="false">A channel you subscribe to</string>
+    <string name="explore_something_new_for_you" formatted="false">Explore: something new for you</string>
+    <string name="popular_now" formatted="false">Popular now</string>
+    <string name="language" formatted="false">Language</string>
+    <string name="bangla" formatted="false">Bangla</string>
+    <string name="system" formatted="false">System</string>
+    <string name="theme" formatted="false">Theme</string>
+    <string name="playback" formatted="false">Playback</string>
+    <string name="automatically_skips_sponsor_intro_and_ou" formatted="false">Automatically skips sponsor, intro and outro segments</string>
+    <string name="generates_youtube_s_integrity_token_keep" formatted="false">Generates YouTube\'s integrity token; keep on if videos fail or a \"bot\" error appears</string>
+    <string name="shows_an_estimated_dislike_count" formatted="false">Shows an estimated dislike count</string>
+    <string name="audio_only_default" formatted="false">Audio only (default)</string>
+    <string name="plays_sound_only_saving_data" formatted="false">Plays sound only, saving data</string>
+    <string name="skip_silence_2" formatted="false">Skip silence</string>
+    <string name="auto_bangla_audio" formatted="false">Auto Bangla audio</string>
+    <string name="clear_watch_history" formatted="false">Clear watch history?</string>
+    <string name="clear_search_history" formatted="false">Clear search history?</string>
+    <string name="all_watch_history_will_be_deleted" formatted="false">All watch history will be deleted and videos won\'t resume from where you left off. This can\'t be undone.</string>
+    <string name="all_search_terms_will_be_deleted" formatted="false">All search terms will be deleted. This can\'t be undone.</string>
+    <string name="delete_playlist_confirm_title" formatted="false">Delete \"{0}\"?</string>
+    <string name="delete_playlist_confirm_body" formatted="false">The playlist and all its videos will be removed from the list. This can\'t be undone.</string>
+    <string name="reset_profile_confirm_body" formatted="false">Everything learned about your interests will be erased. This can\'t be undone.</string>
+    <string name="delete" formatted="false">Delete</string>
+    <string name="plays_in_bangla_automatically_when_a" formatted="false">Plays in Bangla automatically when a Bangla audio track is available</string>
+    <string name="default_video_quality" formatted="false">Default video quality</string>
+    <string name="wi_fi" formatted="false">Wi-Fi</string>
+    <string name="mobile_data" formatted="false">Mobile data</string>
+    <string name="youtube_links" formatted="false">YouTube links</string>
+    <string name="to_open_youtube_com_and_youtu" formatted="false">To open youtube.com and youtu.be links in TubeX, turn the links on under \"Open by default\". You can also share links to TubeX from the share menu.</string>
+    <string name="open_by_default_settings" formatted="false">Open-by-default settings</string>
+    <string name="your_recommendation_profile" formatted="false">Your recommendation profile</string>
+    <string name="all_data_stays_on_this_phone_2" formatted="false">All data stays on this phone. See what the app has learned about you.</string>
+    <string name="nothing_learned_yet_watch_a_few_2" formatted="false">Nothing learned yet — watch a few videos.</string>
+    <string name="channel_2" formatted="false">Channel: {0}</string>
+    <string name="topic" formatted="false">Topic: {0}</string>
+    <string name="your_taste_right_now" formatted="false">Your taste right now ({0})</string>
+    <string name="your_different_tastes_by_weekday_weekend" formatted="false">Your different tastes by weekday/weekend and time of day.</string>
+    <string name="not_enough_data_for_this_time_2" formatted="false">Not enough data for this time yet.</string>
+    <string name="new_video_notifications" formatted="false">New video notifications</string>
+    <string name="subscribed_channels" formatted="false">Subscribed channels</string>
+    <string name="checks_occasionally_in_the_background_an" formatted="false">Checks occasionally in the background and notifies you</string>
+    <string name="every_h" formatted="false">Every {0} h</string>
+    <string name="check_now" formatted="false">Check now</string>
+    <string name="replaces_clickbait_titles_and_thumbnails" formatted="false">Replaces clickbait titles and thumbnails with community versions</string>
+    <string name="titles" formatted="false">Titles</string>
+    <string name="shows_more_honest_titles" formatted="false">Shows more honest titles</string>
+    <string name="thumbnails" formatted="false">Thumbnails</string>
+    <string name="thumbnails_taken_from_the_video_itself" formatted="false">Thumbnails taken from the video itself</string>
+    <string name="block_list" formatted="false">Block list</string>
+    <string name="you_can_also_choose_not_interested" formatted="false">You can also choose \"Not interested\" or block from a video card\'s ⋮ menu.</string>
+    <string name="block_keyword" formatted="false">Block keyword</string>
+    <string name="add" formatted="false">Add</string>
+    <string name="keyword" formatted="false">Keyword: {0}</string>
+    <string name="video_2" formatted="false">Video: {0}</string>
+    <string name="remove" formatted="false">Remove</string>
+    <string name="data" formatted="false">Data</string>
+    <string name="settings" formatted="false">Settings</string>
+    <string name="view_all" formatted="false">View all</string>
+    <string name="on" formatted="false">On</string>
+    <string name="play" formatted="false">Play</string>
+    <string name="pause" formatted="false">Pause</string>
+    <string name="resume" formatted="false">Resume</string>
+    <string name="retry" formatted="false">Retry</string>
+    <string name="save_to_gallery" formatted="false">Save to gallery</string>
+    <string name="share_2" formatted="false">Share</string>
+    <string name="watch_online" formatted="false">Watch online</string>
+    <string name="select" formatted="false">Select</string>
+    <string name="details" formatted="false">Details</string>
+    <string name="close" formatted="false">Close</string>
+    <string name="type" formatted="false">Type: {0}</string>
+    <string name="status" formatted="false">Status: {0}</string>
+    <string name="file_location" formatted="false">File location: {0}</string>
+    <string name="repeat_shuffle" formatted="false">Repeat &amp; shuffle</string>
+    <string name="audio_2" formatted="false">Audio</string>
+    <string name="audio_only_skip_silence" formatted="false">Audio only, skip silence</string>
+    <string name="change_the_app_language" formatted="false">Change the app language</string>
+    <string name="theme_colors_and_look" formatted="false">Theme, colors and look</string>
+    <string name="autoplay_pip_floating_player_skip_sponso" formatted="false">Autoplay, PiP, floating player, skip sponsors</string>
+    <string name="video_quality_and_data_saving" formatted="false">Video quality and data saving</string>
+    <string name="wi_fi_only_and_parallel_downloads" formatted="false">Wi-Fi only and parallel downloads</string>
+    <string name="search_and_watch_history" formatted="false">Search and watch history</string>
+    <string name="new_videos_from_subscribed_channels" formatted="false">New videos from subscribed channels</string>
+    <string name="fix_clickbait_titles_and_thumbnails" formatted="false">Fix clickbait titles and thumbnails</string>
+    <string name="how_youtube_links_open" formatted="false">How YouTube links open</string>
+    <string name="topics_you_re_interested_in" formatted="false">Topics you\'re interested in</string>
+    <string name="channels_and_words_to_hide" formatted="false">Channels and words to hide</string>
+    <string name="import_export_and_reset" formatted="false">Import, export and reset</string>
+    <string name="version_and_updates" formatted="false">Version and updates</string>
+    <string name="about" formatted="false">About</string>
+    <string name="version_build" formatted="false">Version {0} (build {1})</string>
+    <string name="check_for_updates" formatted="false">Check for updates</string>
+    <string name="checking" formatted="false">Checking…</string>
+    <string name="you_re_on_the_latest_version" formatted="false">You\'re on the latest version</string>
+    <string name="new_version_available" formatted="false">New version {0} available</string>
+    <string name="download_update" formatted="false">Download update</string>
+    <string name="couldn_t_check_for_updates_no" formatted="false">Couldn\'t check for updates (no internet or no release)</string>
+    <string name="update_source_not_set_it_s" formatted="false">Update source not set: it\'s set automatically in GitHub Actions builds; locally pass -PupdateRepo=owner/repo</string>
+    <string name="update_notifications" formatted="false">Update notifications</string>
+    <string name="get_a_notification_and_an_in" formatted="false">Get a notification and an in-app popup when a new version is out (checked every 24 hours)</string>
+    <string name="later" formatted="false">Later</string>
+    <string name="source_code_releases_page" formatted="false">Source code / releases page</string>
+    <string name="app_updates" formatted="false">App updates</string>
+    <string name="tubex_update" formatted="false">TubeX update</string>
+    <string name="version_is_available_you_have" formatted="false">Version {0} is available (you have {1})</string>
+    <string name="newpipe_import_subscriptions_json_or_bac" formatted="false">NewPipe import (subscriptions JSON or backup ZIP: subscriptions + history)</string>
+    <string name="reset_recommendation_profile" formatted="false">Reset recommendation profile</string>
+    <string name="clear_watch_history_2" formatted="false">Clear watch history</string>
+    <string name="export_profile_subscriptions_playlists_h" formatted="false">Export profile (subscriptions, playlists, history, recommendations)</string>
+    <string name="import_profile" formatted="false">Import profile</string>
+    <string name="home" formatted="false">Home</string>
+    <string name="subscriptions" formatted="false">Subscriptions</string>
+    <string name="library" formatted="false">Library</string>
+    <string name="search" formatted="false">Search</string>
+    <string name="type_what_you_want_to_find" formatted="false">Type what you want to find</string>
+    <string name="for_you" formatted="false">For you</string>
+    <string name="music" formatted="false">Music</string>
+    <string name="gaming" formatted="false">Gaming</string>
+    <string name="news" formatted="false">News</string>
+    <string name="live" formatted="false">Live</string>
+    <string name="cooking" formatted="false">Cooking</string>
+    <string name="cricket" formatted="false">Cricket</string>
+    <string name="continue_watching" formatted="false">Continue watching</string>
+    <string name="why_was_this_suggested" formatted="false">Why was this suggested?</string>
+    <string name="play_next" formatted="false">Play next</string>
+    <string name="add_to_queue" formatted="false">Add to queue</string>
+    <string name="not_interested_2" formatted="false">Not interested</string>
+    <string name="block_channel" formatted="false">Block \"{0}\" channel</string>
+    <string name="block_keyword_2" formatted="false">Block keyword…</string>
+    <string name="ok" formatted="false">OK</string>
+    <string name="videos_with_this_word_in_the" formatted="false">Videos with this word in the title won\'t be shown anymore.</string>
+    <string name="block" formatted="false">Block</string>
+    <string name="cancel" formatted="false">Cancel</string>
+    <string name="no_playable_stream_found" formatted="false">No playable stream found</string>
+    <string name="dark" formatted="false">Dark</string>
+    <string name="fit" formatted="false">Fit</string>
+    <string name="zoom_crop" formatted="false">Zoom (crop)</string>
+    <string name="stretch_to_fill" formatted="false">Stretch to fill</string>
+    <string name="oled_black" formatted="false">OLED Black</string>
+    <string name="light" formatted="false">Light</string>
+    <string name="sort_by" formatted="false">Sort by</string>
+    <string name="top" formatted="false">Top</string>
+    <string name="newest" formatted="false">Newest</string>
+    <string name="oldest" formatted="false">Oldest</string>
+    <string name="sorted_among_the_loaded_comments" formatted="false">Sorted among the loaded comments</string>
+    <string name="hide_replies" formatted="false">Hide replies</string>
+    <string name="replies" formatted="false">{0} replies</string>
+    <string name="view_replies" formatted="false">View replies</string>
+    <string name="more_replies" formatted="false">More replies</string>
+    <string name="floating_mini_player" formatted="false">Floating mini player</string>
+    <string name="keeps_playing_in_a_small_floating" formatted="false">Keeps playing in a small floating window (like PiP) when you go back; drag to move</string>
+    <string name="audio_track" formatted="false">Audio track</string>
+    <string name="couldn_t_load_subtitles_turned_off" formatted="false">Couldn\'t load subtitles; turned off</string>
+    <string name="pip_playback" formatted="false">PiP playback</string>
+    <string name="downloads_running" formatted="false">{0} downloads running</string>
+    <string name="selected" formatted="false">{0} selected</string>
+    <string name="autoplay" formatted="false">Autoplay</string>
+    <string name="accent_color" formatted="false">Accent color</string>
+    <string name="audio_keeps_playing_when_you_leave" formatted="false">Audio keeps playing when you leave the app or turn off the screen</string>
+    <string name="search_history" formatted="false">Search history</string>
+    <string name="simultaneous_downloads" formatted="false">Simultaneous downloads</string>
+    <string name="waiting_for_wi_fi" formatted="false">Waiting for Wi-Fi</string>
+    <string name="watch_history_is_off_turn_it" formatted="false">Watch history is off (turn it on in Settings)</string>
+    <string name="save_watch_history" formatted="false">Save watch history</string>
+    <string name="custom_color" formatted="false">Custom color</string>
+    <string name="nothing_found" formatted="false">Nothing found</string>
+    <string name="saved_to_gallery" formatted="false">Saved to gallery</string>
+    <string name="active_queued" formatted="false">Active / queued ({0})</string>
+    <string name="appearance_theme" formatted="false">Appearance &amp; theme</string>
+    <string name="channel_3" formatted="false">Channel</string>
+    <string name="data_saver_quality" formatted="false">Data saver &amp; quality</string>
+    <string name="data_saver_mode" formatted="false">Data saver mode</string>
+    <string name="theme_default" formatted="false">Theme default</string>
+    <string name="newest_first" formatted="false">Newest first</string>
+    <string name="name" formatted="false">Name</string>
+    <string name="oldest_first" formatted="false">Oldest first</string>
+    <string name="privacy_history" formatted="false">Privacy &amp; history</string>
+    <string name="rename_playlist" formatted="false">Rename playlist</string>
+    <string name="switches_between_dark_and_light_theme" formatted="false">Switches between dark and light theme to match your phone</string>
+    <string name="when_off_watched_videos_aren_t" formatted="false">When off, watched videos aren\'t added to history (and won\'t resume from where you left off)</string>
+    <string name="when_off_search_terms_aren_t" formatted="false">When off, search terms aren\'t remembered</string>
+    <string name="background_play" formatted="false">Background play</string>
+    <string name="pressing_home_while_a_video_plays" formatted="false">Pressing Home while a video plays keeps it going in a small window</string>
+    <string name="the_next_video_plays_automatically_when" formatted="false">The next video plays automatically when one ends</string>
+    <string name="downloads_wait_on_mobile_data_and" formatted="false">Downloads wait on mobile data and resume on Wi-Fi</string>
+    <string name="download_on_wi_fi_only" formatted="false">Download on Wi-Fi only</string>
+    <string name="share_failed" formatted="false">Share failed: {0}</string>
+    <string name="all" formatted="false">All</string>
+    <string name="max_360p_on_every_network_and" formatted="false">Max 360p on every network and no preloading of the next video</string>
+    <string name="completed" formatted="false">Completed ({0}) • {1}</string>
+    <string name="clear_search_history_2" formatted="false">Clear search history</string>
+    <string name="search_history_cleared" formatted="false">Search history cleared</string>
+    <string name="save_search_history" formatted="false">Save search history</string>
+    <string name="follow_system_theme_auto" formatted="false">Follow system theme (auto)</string>
+    <string name="couldn_t_save" formatted="false">Couldn\'t save</string>
+    <string name="save_failed" formatted="false">Save failed: {0}</string>
+    <string name="can_t_save_without_storage_permission" formatted="false">Can\'t save without storage permission</string>
+    <string name="filter" formatted="false">Filter</string>
+    <string name="clear_filters" formatted="false">Clear filters</string>
+    <string name="upload_date" formatted="false">Upload date</string>
+    <string name="duration" formatted="false">Duration</string>
+    <string name="sort_by_2" formatted="false">Sort by</string>
+    <string name="any_time" formatted="false">Any time</string>
+    <string name="today" formatted="false">Today</string>
+    <string name="this_week" formatted="false">This week</string>
+    <string name="this_month" formatted="false">This month</string>
+    <string name="this_year" formatted="false">This year</string>
+    <string name="any_duration" formatted="false">Any duration</string>
+    <string name="short_under_4_min" formatted="false">Short (under 4 min)</string>
+    <string name="medium_420_min" formatted="false">Medium (4–20 min)</string>
+    <string name="long_over_20_min" formatted="false">Long (over 20 min)</string>
+    <string name="relevance" formatted="false">Relevance</string>
+    <string name="most_viewed" formatted="false">Most viewed</string>
+    <string name="no_videos_match_the_filters" formatted="false">No videos match the filters</string>
+    <string name="results" formatted="false">{0} results</string>
+    <string name="playlist" formatted="false">Playlist: {0}</string>
+    <string name="playlists_for_you" formatted="false">Playlists for you</string>
+    <string name="export_recommendations_only" formatted="false">Export recommendations only</string>
+    <string name="import_recommendations_only" formatted="false">Import recommendations only</string>
+    <string name="recommendation_profile_exported" formatted="false">Recommendation profile exported</string>
+    <string name="recommendation_profile_imported" formatted="false">Recommendation profile imported</string>
+    <!-- SponsorBlock ক্যাটাগরি ও ডাউনলোড সময়সীমা -->
+    <string name="sponsor_category" formatted="false">Sponsor</string>
+    <string name="self_promotion" formatted="false">Self-promotion</string>
+    <string name="subscribe_like_reminders" formatted="false">Subscribe/like reminders</string>
+    <string name="intro" formatted="false">Intro</string>
+    <string name="outro" formatted="false">Outro</string>
+    <string name="filler_category" formatted="false">Filler (off-topic tangents)</string>
+    <string name="segments_to_skip" formatted="false">Segments to skip</string>
+    <string name="filler_warning" formatted="false">Turning on filler may also cut real content</string>
+    <string name="download_timeout_paused" formatted="false">System time limit reached — downloads paused. Open the app and resume them.</string>
 </resources>

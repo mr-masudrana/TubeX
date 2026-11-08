@@ -8,6 +8,7 @@ import com.tubex.app.util.L
 
 import java.util.Calendar
 import java.util.TimeZone
+import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -33,7 +34,21 @@ object Recommender {
             .distinct().take(8)
 
     private fun decayed(e: InterestEntity, now: Long): Double =
-        e.score * 0.5.pow((now - e.updatedAt) / HALF_LIFE_MS)
+        e.score * 0.5.pow((now - e.updatedAt).coerceAtLeast(0L) / HALF_LIFE_MS)   // ঘড়ি পেছালে স্কোর ফুলে ওঠে না
+
+    /** সর্বোচ্চ কতগুলো আগ্রহ-এন্ট্রি রাখা হবে (প্রতিটি বিষয়ের সাথে সময়-বাকেটের কপিও গোনা হয়) */
+    private const val MAX_INTERESTS = 600
+
+    /**
+     * সীমা ছাড়ালে সবচেয়ে কম প্রভাবের এন্ট্রি বাদ: |সময়-ক্ষয়ী স্কোর| ধরে। আগের SQL কাঁচা স্কোরে সাজাত, তাই
+     * নেগেটিভ ("আগ্রহ নেই") সিগন্যাল সবার আগে মুছত আর পুরনো, ক্ষয়ে যাওয়া বিষয় চিরকাল থেকে যেত।
+     */
+    suspend fun prune(dao: AppDao, now: Long = System.currentTimeMillis()) {
+        val all = dao.interests()
+        if (all.size <= MAX_INTERESTS) return
+        all.sortedBy { abs(decayed(it, now)) }.take(all.size - MAX_INTERESTS)
+            .map { it.topic }.chunked(500).forEach { dao.deleteInterests(it) }
+    }
 
     // ---------- সময়ের প্যাটার্ন ----------
     fun bucket(cal: Calendar = Calendar.getInstance()): String {
@@ -84,7 +99,7 @@ object Recommender {
         dao.upsertInterests(acc.map { (k, add) ->
             InterestEntity(k, (existing[k]?.let { decayed(it, now) } ?: 0.0) + add, now)
         })
-        dao.pruneInterests()
+        prune(dao)
     }
 
     /** ইম্পোর্ট করা ইতিহাস থেকে প্রোফাইল তৈরি (সময়-বাকেট ছাড়া) */
@@ -98,7 +113,62 @@ object Recommender {
         dao.upsertInterests(acc.map { (k, add) ->
             InterestEntity(k, (existing[k]?.let { decayed(it, now) } ?: 0.0) + add, now)
         })
-        dao.pruneInterests()
+        prune(dao)
+    }
+
+
+    // ---------- ড্যাশবোর্ড: সারসংক্ষেপ ও নিয়ন্ত্রণ ----------
+    /** সম্পূর্ণ প্রোফাইলের সারসংক্ষেপ; [now] টেস্টে স্থির সময় দেওয়ার জন্য */
+    fun summary(
+        interests: List<InterestEntity>, now: Long = System.currentTimeMillis(),
+        nChannels: Int = 6, nKeywords: Int = 10, nAvoided: Int = 6
+    ): ProfileSummary {
+        val global = interests.filter { !it.topic.startsWith("t:") }.map { it.topic to decayed(it, now) }
+        val pos = global.filter { it.second > 0.05 }
+        val channels = pos.filter { it.first.startsWith("ch:") }.sortedByDescending { it.second }
+        val keywords = pos.filter { it.first.startsWith("kw:") }.sortedByDescending { it.second }
+        val avoided = global.filter { it.second < -0.3 }.sortedBy { it.second }.take(nAvoided)
+
+        val totals = HashMap<String, Double>()
+        val perBucket = HashMap<String, MutableList<Pair<String, Double>>>()
+        interests.filter { it.topic.startsWith("t:") }.forEach { e ->
+            val parts = e.topic.split(":", limit = 3)      // t : বাকেট : kw:শব্দ
+            if (parts.size < 3 || !parts[2].startsWith("kw:")) return@forEach
+            val v = decayed(e, now)
+            if (v <= 0.05) return@forEach
+            totals[parts[1]] = (totals[parts[1]] ?: 0.0) + v
+            perBucket.getOrPut(parts[1]) { ArrayList() }.add(parts[2].removePrefix("kw:") to v)
+        }
+        return ProfileSummary(
+            channels = channels.take(nChannels).map { it.first.removePrefix("ch:") to it.second },
+            keywords = keywords.take(nKeywords).map { it.first.removePrefix("kw:") to it.second },
+            avoided = avoided,
+            bucketTotals = ProfileSummary.BUCKETS.associateWith { totals[it] ?: 0.0 },
+            bucketTops = ProfileSummary.BUCKETS.associateWith { b ->
+                perBucket[b].orEmpty().sortedByDescending { it.second }.take(3).map { it.first }
+            },
+            totalChannels = channels.size,
+            totalKeywords = keywords.size
+        )
+    }
+
+    /** একটি আগ্রহের কী ("kw:x"/"ch:y") ও তার সব সময়-বাকেটের কপি ("t:বাকেট:kw:x") */
+    fun relatedKeys(all: List<InterestEntity>, topic: String): List<String> =
+        all.map { it.topic }.filter {
+            it == topic || (it.startsWith("t:") && it.substringAfter(':').substringAfter(':') == topic)
+        }
+
+    /** প্রভাব কমানো: স্কোরের মান [factor] গুণ হয় (০–১) */
+    fun dampen(e: InterestEntity, factor: Double, now: Long = System.currentTimeMillis()): InterestEntity =
+        InterestEntity(e.topic, decayed(e, now) * factor, now)
+
+    /** বিরক্তি: সাম্প্রতিক ১০টি দেখার মধ্যে ৪+ বার আসা বিষয়/চ্যানেলের কী */
+    fun boredKeys(recent: List<HistoryEntity>): Set<String> {
+        val count = HashMap<String, Int>()
+        recent.take(10).forEach { h ->
+            keysFor(h.title, h.channel).forEach { (k, _) -> count[k] = (count[k] ?: 0) + 1 }
+        }
+        return count.filter { it.value >= 4 }.keys
     }
 
     // ---------- ড্যাশবোর্ডের জন্য ----------
@@ -151,7 +221,7 @@ object Recommender {
     }
 
     // ---------- র‍্যাংকিং ----------
-    private data class Scored(val v: VideoItem, val score: Double, val reason: String)
+    private data class Scored(val v: VideoItem, val score: Double, val reason: String, val why: List<String>)
 
     fun rank(
         videos: List<VideoItem>, interests: List<InterestEntity>, seen: Set<String>,
@@ -164,11 +234,7 @@ object Recommender {
         val map = interests.associate { it.topic to decayed(it, now) }
 
         // বিরক্তি: সাম্প্রতিক ১০টির মধ্যে ৪+ বার আসা বিষয়/চ্যানেলের প্রভাব কমে
-        val recentCount = HashMap<String, Int>()
-        recent.take(10).forEach { h ->
-            keysFor(h.title, h.channel).forEach { (k, _) -> recentCount[k] = (recentCount[k] ?: 0) + 1 }
-        }
-        val bored = recentCount.filter { it.value >= 4 }.keys
+        val bored = boredKeys(recent)
 
         fun contribution(k: String): Double {
             var s = (map[k] ?: 0.0) + 0.6 * (map["t:$b:$k"] ?: 0.0)
@@ -179,10 +245,12 @@ object Recommender {
         fun score(v: VideoItem): Scored {
             var bestVal = 0.0
             var bestLabel = ""
+            val signals = ArrayList<Pair<Double, String>>()     // (শক্তি, কারণ) — "কেন সাজেস্ট হলো?"-র জন্য
             val chLower = v.channel.lowercase()
 
             val chScore = contribution("ch:$chLower")
             var total = chScore
+            if (chScore > 0.3) signals += chScore to L.f("আপনি \"{0}\" চ্যানেল প্রায়ই দেখেন", v.channel)
             if (chScore > bestVal) { bestVal = chScore; bestLabel = L.f("আপনি \"{0}\" চ্যানেল প্রায়ই দেখেন", v.channel) }
 
             val kws = keywords(v.title)
@@ -190,6 +258,11 @@ object Recommender {
             kws.forEach { w ->
                 val c = contribution("kw:$w")
                 kwSum += c
+                if (c > 0.3) {
+                    val tb = 0.6 * (map["t:$b:kw:$w"] ?: 0.0)
+                    signals += c to (if (tb > c * 0.45) L.f("এই সময়ে ({0}) আপনার পছন্দ: {1}", bucketLabel(b), w)
+                                     else L.f("আপনার আগ্রহের বিষয়: {0}", w))
+                }
                 if (c > bestVal) {
                     bestVal = c
                     val timeBoost = 0.6 * (map["t:$b:kw:$w"] ?: 0.0)
@@ -201,12 +274,14 @@ object Recommender {
 
             if (chLower in subscribed) {
                 total += 1.0
+                signals += 1.0 to L.t("আপনার সাবস্ক্রাইব করা চ্যানেল")
                 if (bestVal < 1.0) { bestVal = 1.0; bestLabel = L.t("আপনার সাবস্ক্রাইব করা চ্যানেল") }
             }
 
             // সাম্প্রতিক দেখা ভিডিওর "related" থেকে: স্বাভাবিকভাবে বিষয় বদলের সুযোগ
             if (v.url in related) {
                 total += 0.8
+                signals += 0.8 to L.t("আপনার সাম্প্রতিক দেখার সাথে সম্পর্কিত")
                 if (bestVal < 0.8) { bestVal = 0.8; bestLabel = L.t("আপনার সাম্প্রতিক দেখার সাথে সম্পর্কিত") }
             }
 
@@ -218,14 +293,16 @@ object Recommender {
 
             // আগে ফিডে দেখানো হয়েছে কিন্তু খোলা হয়নি: প্রতিবার একটু করে নিচে নামে, যাতে রিফ্রেশে নতুন ভিডিও ওঠে
             total -= impressionPenalty(shown[v.url] ?: 0)
-            total += recencyBonus(v.uploaded)
+            val fresh = recencyBonus(v.uploaded)
+            if (fresh >= 0.4) signals += 0.4 to L.t("নতুন আপলোড")
+            total += fresh
             total += Random.nextDouble() * 0.9     // এলোমেলো = নতুন কিছুর সুযোগ
             val reason = when {
                 bestLabel.isNotEmpty() && bestVal > 0.3 -> bestLabel
                 total < 0.3 -> L.t("এক্সপ্লোর: আপনার জন্য নতুন কিছু")
                 else -> L.t("এখন জনপ্রিয়")
             }
-            return Scored(v, total, reason)
+            return Scored(v, total, reason, signals.sortedByDescending { it.first }.map { it.second }.distinct().take(3))
         }
 
         val scored = videos.filter { it.url !in seen }.map { score(it) }.sortedByDescending { it.score }
@@ -235,7 +312,7 @@ object Recommender {
         val first = ArrayList<VideoItem>()
         val rest = ArrayList<VideoItem>()
         for (s in scored) {
-            val item = s.v.copy(reason = s.reason)
+            val item = s.v.copy(reason = s.reason, why = s.why)
             val c = count[item.channel] ?: 0
             if (c < 2) { first.add(item); count[item.channel] = c + 1 } else rest.add(item)
         }

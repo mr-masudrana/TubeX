@@ -20,7 +20,7 @@ fun fmtCount(v: Long): String = when {
 fun fmtDur(s: Long): String {
     if (s <= 0) return "LIVE"
     val h = s / 3600; val m = (s % 3600) / 60; val sec = s % 60
-    return if (h > 0) "%d:%02d:%02d".format(h, m, sec) else "%d:%02d".format(m, sec)
+    return if (h > 0) "%d:%02d:%02d".format(Locale.US, h, m, sec) else "%d:%02d".format(Locale.US, m, sec)
 }
 
 fun fixUrl(u: String?): String? = u?.takeIf { it.isNotBlank() }?.let { if (it.startsWith("//")) "https:$it" else it }
@@ -28,5 +28,5 @@ fun fixUrl(u: String?): String? = u?.takeIf { it.isNotBlank() }?.let { if (it.st
 /** 0 সহ সময় দেখায় (চ্যাপ্টারের জন্য) */
 fun fmtTime(s: Long): String {
     val h = s / 3600; val m = (s % 3600) / 60; val sec = s % 60
-    return if (h > 0) "%d:%02d:%02d".format(h, m, sec) else "%d:%02d".format(m, sec)
+    return if (h > 0) "%d:%02d:%02d".format(Locale.US, h, m, sec) else "%d:%02d".format(Locale.US, m, sec)
 }

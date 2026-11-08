@@ -76,12 +76,13 @@ object ProfileBackup {
             dao.upsertInterests(list.map { InterestEntity(it.getString("topic"), it.optDouble("score", 0.0), it.optLong("updatedAt")) })
         }
         root.optJSONArray("history")?.objects()?.forEach {
-            dao.upsertHistory(
-                HistoryEntity(
-                    it.getString("url"), it.optString("title"), it.optString("channel"), s(it, "channelUrl"),
-                    s(it, "thumb"), it.optLong("durationSec"), it.optLong("positionMs"), it.optLong("watchedAt")
-                )
+            val h = HistoryEntity(
+                it.getString("url"), it.optString("title"), it.optString("channel"), s(it, "channelUrl"),
+                s(it, "thumb"), it.optLong("durationSec"), it.optLong("positionMs"), it.optLong("watchedAt")
             )
+            // ফোনে আরও নতুন এন্ট্রি (পজিশনসহ) থাকলে ব্যাকআপের পুরনোটা তার ওপর বসাই না
+            val local = dao.historyOf(h.url)
+            if (local == null || local.watchedAt < h.watchedAt) dao.upsertHistory(h)
         }
         root.optJSONArray("blocks")?.let { a -> for (i in 0 until a.length()) dao.addBlock(BlockEntity(a.getString(i))) }
         root.optJSONArray("favorites")?.objects()?.forEach {

@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.schabi.newpipe.extractor.Page
 
@@ -25,16 +26,28 @@ class CommentsController(private val scope: CoroutineScope) {
     private var nextPage: Page? = null
 
     /** অন্য ভিডিও/লোকাল ফাইল চালালে পুরনো মন্তব্য সরানো */
-    fun clearList() { items = emptyList() }
+    fun clearList() {
+        loadJob?.cancel(); url = ""
+        items = emptyList(); nextPage = null; hasMore = false; loading = false; loadingMore = false
+    }
 
-    fun load(videoUrl: String) = scope.launch {
+    private var loadJob: Job? = null
+
+    fun load(videoUrl: String): Job {
+        loadJob?.cancel()
         url = videoUrl; nextPage = null; hasMore = false
-        loading = true; items = emptyList(); total = 0; replyStates = emptyMap()
-        runCatching { YtRepository.comments(videoUrl) }.onSuccess { p ->
-            items = p.items; nextPage = p.next; hasMore = p.next != null
-            total = if (p.total > 0) p.total else 0
+        loading = true; loadingMore = false; items = emptyList(); total = 0; replyStates = emptyMap()
+        val j = scope.launch {
+            val res = runCatching { YtRepository.comments(videoUrl) }
+            if (url != videoUrl) return@launch   // এর মধ্যে অন্য ভিডিও চালু হয়েছে: পুরনো মন্তব্য বসাই না
+            res.onSuccess { p ->
+                items = p.items; nextPage = p.next; hasMore = p.next != null
+                total = if (p.total > 0) p.total else 0
+            }
+            loading = false
         }
-        loading = false
+        loadJob = j
+        return j
     }
 
     /** স্ক্রোল শেষের কাছে এলে পরের পেজ */
@@ -42,14 +55,16 @@ class CommentsController(private val scope: CoroutineScope) {
         val page = nextPage ?: return
         if (loadingMore) return
         scope.launch {
+            val u = url
             loadingMore = true
-            runCatching { YtRepository.moreComments(url, page) }
-                .onSuccess { p ->
+            val res = runCatching { YtRepository.moreComments(u, page) }
+            if (u == url) {   // ভিডিও বদলে গেলে পুরনো পেজ বসাই না
+                res.onSuccess { p ->
                     val have = items.map { it.id }.toSet()
                     items = items + p.items.filter { it.id !in have }
                     nextPage = p.next; hasMore = p.next != null
-                }
-                .onFailure { hasMore = false }
+                }.onFailure { hasMore = false }
+            }
             loadingMore = false
         }
     }
@@ -77,9 +92,11 @@ class CommentsController(private val scope: CoroutineScope) {
     }
 
     private fun loadReplies(id: String, page: Page) = scope.launch {
+        val u = url
         val cur = replyStates[id] ?: ReplyState()
         replyStates = replyStates + (id to cur.copy(loading = true, expanded = true))
-        val res = runCatching { YtRepository.moreComments(url, page) }.getOrNull()
+        val res = runCatching { YtRepository.moreComments(u, page) }.getOrNull()
+        if (u != url) return@launch   // ভিডিও বদলে গেছে
         val st = replyStates[id] ?: cur
         replyStates = replyStates + (id to
                 if (res != null) st.copy(items = st.items + res.items, next = res.next, loading = false)

@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- স্ক্রিন বন্ধ রেখে ব্যাকগ্রাউন্ড প্লেতে CPU/ওয়াইফাই ঘুমিয়ে না পড়ার জন্য (ExoPlayer WAKE_MODE_NETWORK) -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Android 9 ও পুরনোতে গ্যালারিতে সেভের জন্য -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
@@ -33,7 +35,7 @@
             android:supportsPictureInPicture="true"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation">
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|uiMode">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

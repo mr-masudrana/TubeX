@@ -26,6 +26,7 @@ interface AppDao {
     @Insert suspend fun addDownload(d: DownloadEntity): Long
     @Delete suspend fun removeDownload(d: DownloadEntity)
     @Query("SELECT * FROM downloads WHERE state = 0 ORDER BY id LIMIT 1") suspend fun nextQueued(): DownloadEntity?
+    @Query("SELECT * FROM downloads WHERE id = :id LIMIT 1") suspend fun downloadById(id: Long): DownloadEntity?
     @Query("SELECT * FROM downloads WHERE path = :path LIMIT 1") suspend fun downloadByPath(path: String): DownloadEntity?
     @Query("UPDATE downloads SET state = :state WHERE id = :id") suspend fun setState(id: Long, state: Int)
     @Query("UPDATE downloads SET state = 1 WHERE id = :id AND state = 0") suspend fun markRunning(id: Long): Int
@@ -35,7 +36,8 @@ interface AppDao {
     @Query("UPDATE downloads SET state = 2 WHERE state IN (0, 1, 5)") suspend fun pauseAll()
     @Query("UPDATE downloads SET state = 0 WHERE id = :id AND state IN (2, 4)") suspend fun resumeOne(id: Long)
     @Query("UPDATE downloads SET state = 0 WHERE state IN (2, 4)") suspend fun resumeAll()
-    @Query("UPDATE downloads SET state = 2 WHERE state IN (1, 5)") suspend fun resetInterrupted()
+    /** অ্যাপ কিল/ক্র্যাশে মাঝপথে থেমে যাওয়া ডাউনলোড কিউতে ফেরে (আংশিক ফাইল থেকে রিজিউম হয়); ব্যবহারকারীর থামানোগুলো থামানোই থাকে */
+    @Query("UPDATE downloads SET state = 0 WHERE state IN (1, 5)") suspend fun resetInterrupted()
     @Query("UPDATE downloads SET state = 0 WHERE id = :id AND state = 1") suspend fun requeueRunning(id: Long): Int
 
     // ইতিহাস
@@ -52,6 +54,7 @@ interface AppDao {
     @Query("SELECT * FROM interests") suspend fun interests(): List<InterestEntity>
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun upsertInterests(list: List<InterestEntity>)
     @Query("DELETE FROM interests") suspend fun clearInterests()
+    @Query("DELETE FROM interests WHERE topic IN (:topics)") suspend fun deleteInterests(topics: List<String>)
     @Query("DELETE FROM interests WHERE topic NOT IN (SELECT topic FROM interests ORDER BY score DESC LIMIT 400)")
     suspend fun pruneInterests()
 

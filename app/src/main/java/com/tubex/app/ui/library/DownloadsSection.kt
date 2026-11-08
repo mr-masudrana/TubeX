@@ -172,7 +172,8 @@ private fun DownloadRow(
                         Item(L.t("গ্যালারিতে সেভ করুন"), Icons.Filled.SaveAlt) { vm.saveToGallery(d) }
                         Item(L.t("শেয়ার করুন"), Icons.Filled.Share) { vm.shareDownload(d) }
                     }
-                    Item(L.t("অনলাইনে দেখুন"), Icons.Filled.OpenInNew) { vm.play(d.videoUrl) }
+                    if (d.videoUrl.isNotBlank())   // পুরনো সংস্করণ থেকে আসা ডাউনলোডে লিংক থাকে না
+                        Item(L.t("অনলাইনে দেখুন"), Icons.Filled.OpenInNew) { vm.play(d.videoUrl) }
                     Item(L.t("বাছাই করুন"), Icons.Filled.CheckCircle) { toggle(d.id) }
                     Item(L.t("বিস্তারিত"), Icons.Filled.Info) { showInfo = true }
                     Item(L.t("মুছুন"), Icons.Filled.Delete, tint = YtRed) { vm.deleteDownload(d) }

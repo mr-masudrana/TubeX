@@ -40,6 +40,8 @@ object PoTokenProviderImpl : PoTokenProvider {
     override fun getWebClientPoToken(videoId: String): PoTokenResult? {
         val ctx = appContext
         if (!enabled || ctx == null || webViewBad || !supportsWebView()) return null
+        // obtain() নেটওয়ার্ক ও WebView-এর জন্য লক ধরে অপেক্ষা করে — মেইন থ্রেডে ডাকলে ANR/ডেডলক, তাই poToken ছাড়াই চলুক
+        if (onMainThread()) { Log.w(TAG, "মেইন থ্রেড থেকে ডাক — poToken বাদ"); return null }
         return try {
             obtain(ctx, videoId, forceRecreate = false)
         } catch (e: BadWebViewException) {
@@ -86,6 +88,8 @@ object PoTokenProviderImpl : PoTokenProvider {
     override fun getWebEmbedClientPoToken(videoId: String): PoTokenResult? = null
     override fun getAndroidClientPoToken(videoId: String): PoTokenResult? = null
     override fun getIosClientPoToken(videoId: String): PoTokenResult? = null
+
+    private fun onMainThread(): Boolean = runCatching { Looper.myLooper() === Looper.getMainLooper() }.getOrDefault(false)
 
     private fun supportsWebView(): Boolean = try {
         android.webkit.CookieManager.getInstance(); true

@@ -2,6 +2,7 @@ package com.tubex.app.ui.settings
 
 import com.tubex.app.data.recommend.Recommender
 import com.tubex.app.data.remote.DeArrow
+import com.tubex.app.data.remote.SponsorCategories
 import com.tubex.app.util.L
 import com.tubex.app.ui.theme.Palettes
 import com.tubex.app.ui.theme.Sub
@@ -75,7 +76,7 @@ internal fun SettingsPage(vm: MainViewModel, page: Int) {
 
         // ---------- ভাষা ----------
         if (page == 0) SectionCard(Icons.Outlined.Language, L.t("ভাষা / Language")) {
-            val modes = listOf(L.t("বাংলা"), "English", L.t("সিস্টেম"))
+            val modes = listOf(L.t("বাংলা"), "English", L.t("সিস্টেম")) + L.extra.map { it.second }
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(modes.size) { i ->
                     FilterChip(selected = vm.langMode == i, onClick = { vm.chooseLang(i) }, label = { Text(modes[i]) })
@@ -158,6 +159,21 @@ internal fun SettingsPage(vm: MainViewModel, page: Int) {
             SwitchRow(L.t("ভাসমান মিনি প্লেয়ার"), L.t("ব্যাক করলে ভিডিও ছোট ভাসমান উইন্ডোতে চলতে থাকবে, টেনে সরানো যায়"), vm.floatingMini) { vm.toggleFloatingMini(it) }
             SwitchRow("Return YouTube Dislike", L.t("ডিসলাইকের আনুমানিক সংখ্যা দেখায়"), vm.rydOn) { vm.toggleRyd(it) }
             SwitchRow("SponsorBlock", L.t("স্পন্সর, ইন্ট্রো, আউট্রো অংশ নিজে বাদ দেয়"), vm.sponsorOn) { vm.toggleSponsor(it) }
+            if (vm.sponsorOn) {
+                val catLabels = mapOf(
+                    "sponsor" to L.t("স্পন্সর"),
+                    "selfpromo" to L.t("নিজের প্রচার"),
+                    "interaction" to L.t("সাবস্ক্রাইব/লাইকের অনুরোধ"),
+                    "intro" to L.t("ইন্ট্রো"),
+                    "outro" to L.t("আউট্রো"),
+                    "filler" to L.t("ফিলার (অপ্রয়োজনীয় কথা)")
+                )
+                Text(L.t("যেসব অংশ বাদ যাবে"), color = Sub, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+                SponsorCategories.ALL.forEach { c ->
+                    SwitchRow(catLabels.getValue(c), "", c in vm.sponsorCats) { vm.toggleSponsorCategory(c, it) }
+                }
+                Text(L.t("ফিলার চালু করলে আসল কথাও কেটে যেতে পারে"), color = Sub, fontSize = 11.sp)
+            }
             SwitchRow("PoToken", L.t("YouTube-এর যাচাই টোকেন তৈরি করে; ভিডিও না চললে বা \"বট\" ত্রুটি এলে চালু রাখুন"), vm.poTokenOn) { vm.togglePoToken(it) }
             SwitchRow(L.t("নীরবতা বাদ"), L.t("কথার ফাঁকের নীরব অংশ বাদ যাবে"), vm.skipSilence) { vm.toggleSkipSilence(it) }
         }
@@ -230,18 +246,20 @@ internal fun SettingsPage(vm: MainViewModel, page: Int) {
         // মুছে ফেলার আগে সতর্কতা (১ = দেখার ইতিহাস, ২ = সার্চ ইতিহাস)
         if (confirmClear != 0) {
             val watch = confirmClear == 1
+            val reset = confirmClear == 3
             AlertDialog(
                 onDismissRequest = { confirmClear = 0 },
-                title = { Text(if (watch) L.t("দেখার ইতিহাস মুছবেন?") else L.t("সার্চ ইতিহাস মুছবেন?")) },
+                title = { Text(if (reset) L.t("রিকমেন্ডেশন প্রোফাইল রিসেট") + "?" else if (watch) L.t("দেখার ইতিহাস মুছবেন?") else L.t("সার্চ ইতিহাস মুছবেন?")) },
                 text = {
                     Text(
-                        if (watch) L.t("সব দেখার ইতিহাস মুছে যাবে এবং ভিডিওগুলো আর শেষ জায়গা থেকে চালু হবে না। এটা আর ফেরানো যাবে না।")
+                        if (reset) L.t("শেখা সব আগ্রহ মুছে যাবে। এটা আর ফেরানো যাবে না।")
+                        else if (watch) L.t("সব দেখার ইতিহাস মুছে যাবে এবং ভিডিওগুলো আর শেষ জায়গা থেকে চালু হবে না। এটা আর ফেরানো যাবে না।")
                         else L.t("সব সার্চের শব্দ মুছে যাবে। এটা আর ফেরানো যাবে না।")
                     )
                 },
                 confirmButton = {
                     TextButton(onClick = {
-                        if (watch) vm.clearHistory() else vm.clearSearchHistory()
+                        if (reset) vm.resetProfile() else if (watch) vm.clearHistory() else vm.clearSearchHistory()
                         confirmClear = 0
                     }) { Text(L.t("মুছে ফেলুন"), color = MaterialTheme.colorScheme.error) }
                 },
@@ -292,23 +310,7 @@ internal fun SettingsPage(vm: MainViewModel, page: Int) {
 
         // ---------- রিকমেন্ডেশন ----------
         if (page == 9) SectionCard(Icons.Outlined.Insights, L.t("আপনার রিকমেন্ডেশন প্রোফাইল")) {
-            Text(L.t("সব ডেটা শুধু এই ফোনে থাকে। এখানে দেখুন অ্যাপ আপনার সম্পর্কে কী শিখেছে।"), color = Sub, fontSize = 12.sp)
-            Spacer(Modifier.height(8.dp))
-            if (vm.topInterests.isEmpty()) Text(L.t("এখনো কিছু শেখেনি — কয়েকটি ভিডিও দেখুন।"), color = Sub, fontSize = 13.sp)
-            val maxScore = vm.topInterests.maxOfOrNull { it.second } ?: 1.0
-            vm.topInterests.forEach { (topic, score) -> InterestRow(topic, score / maxScore) }
-
-            Text(
-                L.f("এই সময়ের পছন্দ ({0})", Recommender.bucketLabel()),
-                fontWeight = FontWeight.Medium, fontSize = 14.sp, modifier = Modifier.padding(top = 16.dp)
-            )
-            Text(L.t("কর্মদিবস/ছুটির দিন ও দিনের সময় অনুযায়ী আপনার আলাদা পছন্দ।"), color = Sub, fontSize = 12.sp)
-            if (vm.contextInterests.isEmpty()) Text(
-                L.t("এই সময়ের জন্য এখনো যথেষ্ট ডেটা নেই।"), color = Sub, fontSize = 13.sp,
-                modifier = Modifier.padding(top = 6.dp)
-            )
-            val maxCtx = vm.contextInterests.maxOfOrNull { it.second } ?: 1.0
-            vm.contextInterests.forEach { (topic, score) -> InterestRow(topic, score / maxCtx) }
+            ProfileDashboard(vm)
         }
 
         // ---------- ব্লক তালিকা ----------
@@ -340,7 +342,7 @@ internal fun SettingsPage(vm: MainViewModel, page: Int) {
             OutlinedButton(onClick = { picker.launch(arrayOf("*/*")) }, modifier = Modifier.fillMaxWidth()) {
                 Text(L.t("NewPipe ইম্পোর্ট (সাবস্ক্রিপশন JSON বা ব্যাকআপ ZIP: সাবস্ক্রিপশন + ইতিহাস)"))
             }
-            OutlinedButton(onClick = { vm.resetProfile() }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+            OutlinedButton(onClick = { confirmClear = 3 }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
                 Text(L.t("রিকমেন্ডেশন প্রোফাইল রিসেট"))
             }
             OutlinedButton(onClick = { interestExporter.launch("tubex-recommendations.json") }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {

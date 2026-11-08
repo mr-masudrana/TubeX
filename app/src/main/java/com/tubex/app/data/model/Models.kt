@@ -13,7 +13,9 @@ data class VideoItem(
     val thumb: String?,
     val uploaded: String?,
     val reason: String? = null,
-    val channelAvatar: String? = null
+    val channelAvatar: String? = null,
+    /** "কেন সাজেস্ট হলো?" — সবচেয়ে জোরালো ১–৩টি কারণ (শুধু ফিডের র‍্যাংকিং ভরে) */
+    val why: List<String> = emptyList()
 )
 
 data class ChannelData(

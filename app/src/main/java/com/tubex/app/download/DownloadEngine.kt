@@ -26,7 +26,9 @@ import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.schabi.newpipe.extractor.ServiceList
+import org.schabi.newpipe.extractor.MediaFormat
 import org.schabi.newpipe.extractor.stream.StreamInfo
+import org.schabi.newpipe.extractor.stream.VideoStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -62,19 +64,28 @@ object DownloadEngine {
         }
     }
 
-    /** ওয়াইফাই/ইথারনেটে আছে কি না (নেটওয়ার্ক না থাকলেও false) */
+    /**
+     * আনমিটারড নেটওয়ার্কে (সাধারণ ওয়াইফাই/ইথারনেট) আছে কি না। নেটওয়ার্ক না থাকলে false।
+     * ফোনের হটস্পট বা "মিটারড" চিহ্নিত ওয়াইফাই আনমিটারড নয়, তাই সেখানে ডেটা খরচ হয় না।
+     */
     private fun onUnmetered(ctx: Context): Boolean {
         val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return false
-        return caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+        val wifiOrWired = caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
             caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+        return wifiOrWired && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
     }
 
     @Synchronized
     fun kick(ctx: Context) {
         val app = ctx.applicationContext
         active.value = true
-        ContextCompat.startForegroundService(app, Intent(app, DownloadService::class.java))
+        // ব্যাকগ্রাউন্ড থেকে ফোরগ্রাউন্ড সার্ভিস শুরু নিষিদ্ধ হলে (Android 12+) ক্র্যাশ নয়: ডাউনলোড লুপ প্রসেসে চলতে থাকে
+        try {
+            ContextCompat.startForegroundService(app, Intent(app, DownloadService::class.java))
+        } catch (e: IllegalStateException) {
+            android.util.Log.w("DownloadEngine", "ফোরগ্রাউন্ড সার্ভিস শুরু করা যায়নি", e)
+        }
         if (loop?.isActive == true) return
         loop = scope.launch {
             val dao = AppDb.get(app).dao()
@@ -124,12 +135,22 @@ object DownloadEngine {
         jobs.values.forEach { it.cancel() }
     }
 
+    /**
+     * Android 15+ এ dataSync সার্ভিসের সময়সীমা শেষ হলে সার্ভিসকে কয়েক সেকেন্ডে থামতে হয়।
+     * তাই সব ডাউনলোড "থামানো" করা হয় — আংশিক ফাইল (.part) থাকে, ব্যবহারকারী পরে রিজিউম করলে Range দিয়ে চলে।
+     */
+    fun pauseForTimeout(ctx: Context) {
+        val app = ctx.applicationContext
+        scope.launch { pauseAll(AppDb.get(app).dao()) }
+    }
+
     suspend fun resume(ctx: Context, dao: AppDao, id: Long) { dao.resumeOne(id); kick(ctx) }
     suspend fun resumeAll(ctx: Context, dao: AppDao) { dao.resumeAll(); kick(ctx) }
 
     suspend fun remove(dao: AppDao, d: DownloadEntity) {
-        jobs[d.id]?.cancelAndJoin()
+        // আগে ডেটাবেস থেকে মুছি: তাহলে কিউ-লুপ আর এটাকে তুলে নিতে পারে না (markRunning ০ ফেরত দেয়)
         dao.removeDownload(d)
+        jobs[d.id]?.cancelAndJoin()
         listOf("", ".part", ".v.part", ".a.part", ".tmp").forEach { File(d.path + it).delete() }
     }
 
@@ -147,6 +168,7 @@ object DownloadEngine {
         fun frac(h: Long, t: Long) = if (t > 0) h.toFloat() / t else 0f
 
         try {
+            if (dao.downloadById(d.id) == null) return   // শুরুর আগেই মুছে ফেলা হয়েছে
             // ফ্রেশ URL: আগের স্ট্রিম URL মেয়াদোত্তীর্ণ হতে পারে
             val info = StreamInfo.getInfo(ServiceList.YouTube, d.videoUrl)
             val final = File(d.path)
@@ -160,7 +182,7 @@ object DownloadEngine {
                 finish(part, final)
             } else if (d.audioItag != 0) {
                 val v = (info.videoOnlyStreams + info.videoStreams).firstOrNull { it.itag == d.videoItag }
-                    ?: info.videoOnlyStreams.firstOrNull { it.height == d.height } ?: error(L.t("ভিডিও স্ট্রিম পাওয়া যায়নি"))
+                    ?: info.videoOnlyStreams.firstOrNull { it.height == d.height && sameKind(it, d.path) } ?: error(L.t("ভিডিও স্ট্রিম পাওয়া যায়নি"))
                 val a = info.audioStreams.firstOrNull { it.itag == d.audioItag }
                     ?: info.audioStreams.maxByOrNull { it.averageBitrate } ?: error(L.t("অডিও স্ট্রিম পাওয়া যায়নি"))
                 val vp = File(d.path + ".v.part")
@@ -183,12 +205,26 @@ object DownloadEngine {
                 fetch(v.content, part) { h, t -> report(frac(h, t)) }
                 finish(part, final)
             }
+            if (dao.downloadById(d.id) == null) {   // চলার মাঝে মুছে ফেলা হয়েছে: পড়ে থাকা ফাইল সরাই
+                listOf("", ".part", ".v.part", ".a.part", ".tmp").forEach { File(d.path + it).delete() }
+                return
+            }
             dao.markDone(d.id)
         } catch (e: CancellationException) {
             File(d.path + ".tmp").delete()   // মার্জের মাঝে থামলে অসম্পূর্ণ ফাইল মুছি
             throw e            // থামানো/মোছা: অবস্থা বাইরে থেকেই ঠিক করা হয়েছে
         } catch (e: Exception) {
             dao.setState(d.id, 4)
+        }
+    }
+
+    /** itag না মিললে height দিয়ে বদলি বাছার সময় কোডেক/কন্টেইনার মেলাই (H.264 MP4 / VP9 WebM / AV1 MP4) */
+    private fun sameKind(s: VideoStream, path: String): Boolean {
+        val c = s.codec ?: ""
+        return when {
+            path.endsWith(".webm") -> s.format == MediaFormat.WEBM
+            path.contains("_av1.") -> c.startsWith("av01")
+            else -> s.format == MediaFormat.MPEG_4 && c.startsWith("avc1")
         }
     }
 
@@ -214,7 +250,13 @@ object DownloadEngine {
             try {
             client.newCall(req).execute().use { resp ->
                 when (resp.code) {
-                    416 -> total = have
+                    416 -> {
+                        // "Content-Range: bytes */সাইজ" — সার্ভারের আসল সাইজ। ফাইল তার চেয়ে বড় হলে নষ্ট, গোড়া থেকে
+                        val size: Long = resp.header("Content-Range")?.substringAfter('/', "")?.toLongOrNull() ?: -1L
+                        if (size < 0 || size == have) total = have
+                        else if (have > size) { file.delete(); have = 0 }
+                        else throw FatalIo("HTTP 416")
+                    }
                     200, 206 -> {
                         val body = resp.body ?: throw FatalIo(L.t("খালি উত্তর"))
                         if (resp.code == 200) {          // সার্ভার রেঞ্জ মানেনি: গোড়া থেকে

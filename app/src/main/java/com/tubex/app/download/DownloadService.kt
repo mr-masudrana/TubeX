@@ -54,11 +54,30 @@ class DownloadService : Service() {
         return START_NOT_STICKY
     }
 
+    private fun openAppIntent(): PendingIntent = PendingIntent.getActivity(
+        this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+        PendingIntent.FLAG_IMMUTABLE
+    )
+
+    /**
+     * Android 15 (API 35)+: dataSync ফোরগ্রাউন্ড সার্ভিস ২৪ ঘণ্টায় সর্বোচ্চ প্রায় ৬ ঘণ্টা চলে (targetSdk ৩৫ হলে কার্যকর)।
+     * সময় শেষে এখানে ডাক আসে; কয়েক সেকেন্ডের মধ্যে stopSelf() না করলে সিস্টেম অ্যাপকে ক্র্যাশ করায়।
+     */
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        DownloadEngine.pauseForTimeout(applicationContext)
+        val n = NotificationCompat.Builder(this, Notif.CH_DL)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(L.t("ডাউনলোড"))
+            .setContentText(L.t("সিস্টেমের সময়সীমা শেষ — ডাউনলোড থামানো হয়েছে। অ্যাপ খুলে আবার চালু করুন।"))
+            .setAutoCancel(true).setContentIntent(openAppIntent())
+            .build()
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIF_ID_TIMEOUT, n)
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
     private fun build(text: String, pct: Int): Notification {
-        val pi = PendingIntent.getActivity(
-            this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        val pi = openAppIntent()
         val b = NotificationCompat.Builder(this, Notif.CH_DL)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(L.t("ডাউনলোড"))
@@ -74,5 +93,8 @@ class DownloadService : Service() {
         super.onDestroy()
     }
 
-    companion object { private const val NOTIF_ID = 4001 }
+    companion object {
+        private const val NOTIF_ID = 4001
+        private const val NOTIF_ID_TIMEOUT = 4002
+    }
 }

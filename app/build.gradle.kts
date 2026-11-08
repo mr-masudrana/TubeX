@@ -16,21 +16,25 @@ fun versionCodeOf(v: String): Int {
 // আপডেট খোঁজার রিপোজিটরি ("owner/repo"): GitHub Actions-এ নিজে সেট হয়; লোকালি -PupdateRepo=owner/repo দিন
 // নাইটলি বিল্ড (NIGHTLY=true): আলাদা অ্যাপ হিসেবে ইনস্টল হয় (.nightly) এবং স্টেবল রিলিজ থেকে আপডেট খোঁজে না
 val nightly: Boolean = System.getenv("NIGHTLY") == "true"
+// FOSS বিল্ড (FOSS=true): অ্যাপের ভেতরের আপডেটার বন্ধ থাকে — IzzyOnDroid/Obtainium/F-Droid দিয়ে আপডেট করুন
+val foss: Boolean = System.getenv("FOSS") == "true"
 val updateRepo: String =
-    if (nightly) "" else (System.getenv("GITHUB_REPOSITORY") ?: (project.findProperty("updateRepo") as String?) ?: "")
+    if (nightly || foss) "" else (System.getenv("GITHUB_REPOSITORY") ?: (project.findProperty("updateRepo") as String?) ?: "")
 
 android {
     namespace = "com.tubex.app"
-    compileSdk = 34
+    compileSdk = 35   // Media3 1.5+ ও Service.onTimeout (Android 15)-এর জন্য; targetSdk নিচে ইচ্ছাকৃতভাবে ৩৪ রাখা
 
     defaultConfig {
         applicationId = "com.tubex.app"
         minSdk = 24
+        // ৩৫ করলে Android 15-এর edge-to-edge বাধ্যতামূলক হয় ও dataSync সময়সীমা কার্যকর হয় — আলাদাভাবে যাচাই করে বাড়ান
         targetSdk = 34
         versionCode = versionCodeOf(appVersion)
         versionName = appVersion
         buildConfigField("String", "UPDATE_REPO", "\"$updateRepo\"")
-        if (nightly) { applicationIdSuffix = ".nightly"; versionNameSuffix = "-nightly" }
+        if (nightly) applicationIdSuffix = ".nightly"
+        versionNameSuffix = (if (nightly) "-nightly" else "") + (if (foss) "-foss" else "")
     }
 
     // রিলিজ সাইনিং: কীস্টোর পরিবেশ ভেরিয়েবল থেকে আসে (নিচে .github/workflows/release.yml দেখুন)।
@@ -80,14 +84,14 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.4")
 
     // YouTube ঘন ঘন বদলায়: ভিডিও না চললে প্রথমে এই ভার্সন আপডেট করুন
     implementation("com.github.TeamNewPipe:NewPipeExtractor:v0.26.5")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("androidx.work:work-runtime-ktx:2.9.1")
+    implementation("androidx.work:work-runtime-ktx:2.10.0")
 
-    val media3 = "1.4.1"
+    val media3 = "1.5.1"
     implementation("androidx.media3:media3-exoplayer:$media3")
     implementation("androidx.media3:media3-exoplayer-hls:$media3")
     implementation("androidx.media3:media3-ui:$media3")
@@ -97,15 +101,15 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
-    implementation(platform("androidx.compose:compose-bom:2024.09.00"))
+    implementation(platform("androidx.compose:compose-bom:2024.12.01"))
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.activity:activity-compose:1.9.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("io.coil-kt:coil-compose:2.7.0")
 
     // Chromecast (Google Play Services লাগে)
-    implementation("com.google.android.gms:play-services-cast-framework:21.5.0")
+    implementation("com.google.android.gms:play-services-cast-framework:22.0.0")
     implementation("androidx.mediarouter:mediarouter:1.7.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.core:core-splashscreen:1.0.1")

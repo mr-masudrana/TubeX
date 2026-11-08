@@ -1,6 +1,6 @@
 name: Release APK
 
-# v1.1 এর মতো ট্যাগ push করলে সাইনড রিলিজ APK + checksums.txt সহ GitHub Release তৈরি হবে।
+# v1.1 এর মতো ট্যাগ push করলে সাইনড রিলিজ APK (tubex.apk ও আপডেটারবিহীন tubex-foss.apk) + checksums.txt সহ GitHub Release তৈরি হবে।
 # দরকারি Secrets: KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
 on:
   push:
@@ -39,21 +39,32 @@ jobs:
       - name: Unit tests
         run: gradle testDebugUnitTest --stacktrace
 
-      - name: Build release APK
+      - name: Build release APK (GitHub build — অ্যাপের ভেতরে আপডেটারসহ)
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: gradle assembleRelease --stacktrace
-
-      - name: Prepare files
         run: |
+          gradle assembleRelease --stacktrace
           mkdir out
           cp app/build/outputs/apk/release/*.apk out/tubex.apk
-          (cd out && sha256sum tubex.apk > checksums.txt)
+
+      - name: Build release APK (FOSS build — আপডেটার ছাড়া)
+        env:
+          FOSS: "true"
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          gradle assembleRelease --stacktrace
+          cp app/build/outputs/apk/release/*.apk out/tubex-foss.apk
+
+      - name: Checksums
+        run: (cd out && sha256sum tubex.apk tubex-foss.apk > checksums.txt)
 
       - uses: softprops/action-gh-release@v2
         with:
           files: |
             out/tubex.apk
+            out/tubex-foss.apk
             out/checksums.txt

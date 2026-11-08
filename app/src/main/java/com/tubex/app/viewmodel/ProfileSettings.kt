@@ -1,6 +1,7 @@
 package com.tubex.app.viewmodel
 
 import com.tubex.app.data.local.Prefs
+import com.tubex.app.data.remote.SponsorCategories
 
 import org.json.JSONObject
 
@@ -10,7 +11,7 @@ import org.json.JSONObject
  */
 object ProfileSettings {
     fun toJson(vm: MainViewModel, prefs: Prefs): JSONObject =
-        JSONObject().put("theme", vm.themeIndex).put("sponsorblock", vm.sponsorOn).put("ryd", vm.rydOn)
+        JSONObject().put("theme", vm.themeIndex).put("sponsorblock", vm.sponsorOn).put("sponsorCats", SponsorCategories.toCsv(vm.sponsorCats)).put("ryd", vm.rydOn)
             .put("captionSize", vm.captionSizeIndex).put("captionLang", prefs.captionLang)
             .put("qualityWifi", vm.qualityWifi).put("qualityMobile", vm.qualityMobile).put("skipSilence", vm.skipSilence)
             .put("captionColor", vm.captionColorIndex).put("captionBg", vm.captionBgIndex).put("lang", vm.langMode)
@@ -27,12 +28,14 @@ object ProfileSettings {
     fun apply(vm: MainViewModel, prefs: Prefs, it: JSONObject) {
         vm.chooseTheme(it.optInt("theme", vm.themeIndex))
         vm.toggleSponsor(it.optBoolean("sponsorblock", vm.sponsorOn))
+        // পুরনো ব্যাকআপে কী নেই → বর্তমান নির্বাচন অপরিবর্তিত
+        if (it.has("sponsorCats")) vm.applySponsorCats(SponsorCategories.parse(it.optString("sponsorCats")))
         vm.toggleRyd(it.optBoolean("ryd", vm.rydOn))
         vm.chooseCaptionSize(it.optInt("captionSize", vm.captionSizeIndex))
         vm.chooseDefaultQuality(true, it.optInt("qualityWifi", vm.qualityWifi))
         vm.chooseDefaultQuality(false, it.optInt("qualityMobile", vm.qualityMobile))
         vm.toggleSkipSilence(it.optBoolean("skipSilence", vm.skipSilence))
-        prefs.captionLang = it.optString("captionLang", "")
+        if (it.has("captionLang")) prefs.captionLang = it.optString("captionLang", "")   // কী না থাকলে বর্তমান ভাষা অপরিবর্তিত
         vm.chooseCaptionColor(it.optInt("captionColor", vm.captionColorIndex))
         vm.chooseCaptionBg(it.optInt("captionBg", vm.captionBgIndex))
         vm.chooseLang(it.optInt("lang", vm.langMode))

@@ -29,10 +29,13 @@ object Extras {
     } catch (e: Exception) { null }
 
     /** প্রাইভেসির জন্য শুধু ভিডিও আইডির SHA-256 হ্যাশের প্রথম ৪ অক্ষর পাঠানো হয়। */
-    suspend fun sponsorSegments(videoId: String): List<Segment> = withContext(Dispatchers.IO) {
+    suspend fun sponsorSegments(
+        videoId: String, categories: List<String> = SponsorCategories.DEFAULT
+    ): List<Segment> = withContext(Dispatchers.IO) {
+        if (categories.isEmpty()) return@withContext emptyList<Segment>()
         val hash = MessageDigest.getInstance("SHA-256").digest(videoId.toByteArray())
             .joinToString("") { "%02x".format(it) }.take(4)
-        val cats = URLEncoder.encode("[\"sponsor\",\"selfpromo\",\"intro\",\"outro\",\"interaction\"]", "UTF-8")
+        val cats = URLEncoder.encode(SponsorCategories.jsonArray(categories), "UTF-8")
         val actions = URLEncoder.encode("[\"skip\"]", "UTF-8")
         val body = get("https://sponsor.ajay.app/api/skipSegments/$hash?categories=$cats&actionTypes=$actions")
             ?: return@withContext emptyList<Segment>()

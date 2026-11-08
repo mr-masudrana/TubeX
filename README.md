@@ -10,8 +10,23 @@ NewPipe Extractor ভিত্তিক YouTube-স্টাইল ভিডি�
 ## নাইটলি বিল্ড
 `main`-এ প্রতিটি push-এ "Nightly APK" ওয়ার্কফ্লো `nightly` প্রি-রিলিজে `tubex-nightly.apk` আপলোড করে। এটি আলাদা অ্যাপ (`com.tubex.app.nightly`) হিসেবে ইনস্টল হয়, স্টেবল অ্যাপের ডেটা ছোঁয়ে না এবং স্টেবল রিলিজ থেকে আপডেট খোঁজে না। `KEYSTORE_BASE64` সিক্রেট থাকলে সাইনড, না থাকলে ডিবাগ APK বানায়।
 
+## রিলিজ ও ডাউনলোড
+`v*` ট্যাগ push করলে GitHub Release-এ দুটি APK ও `checksums.txt` (SHA-256) আসে:
+
+| ফাইল | কী | আপডেট |
+|---|---|---|
+| `tubex.apk` | GitHub বিল্ড | অ্যাপের ভেতর থেকেই |
+| `tubex-foss.apk` | FOSS বিল্ড (আপডেটার ছাড়া) | Obtainium / IzzyOnDroid ইত্যাদি দিয়ে |
+
+লোকালি FOSS বিল্ড: `FOSS=true gradle assembleRelease`। দুটি বিল্ডের `applicationId` একই, তাই একই ফোনে একটির উপর অন্যটি ইনস্টল হয়।
+
+অবদান রাখতে `CONTRIBUTING.md`, নিরাপত্তা-ত্রুটি জানাতে `SECURITY.md` দেখুন।
+
 ## লোকালি বিল্ড
 Android Studio-তে প্রজেক্ট খুলুন, অথবা Gradle 8.9 + JDK 17 দিয়ে `gradle assembleDebug`।
+
+## ভাষা ও অনুবাদ
+লেখা থাকে `app/src/main/res/values*/strings.xml`-এ (বেস ইংরেজি, সাথে বাংলা), তাই Weblate-এর মতো টুলে সরাসরি অনুবাদ করা যায়। নতুন লেখা/ভাষা যোগের নিয়ম `CONTRIBUTING.md`-এ; যাচাই: `python3 tools/gen_string_ids.py --check`।
 
 ## লাইসেন্স
 GPL-3.0 (`LICENSE`) — NewPipe Extractor GPL-3 হওয়ায় এই অ্যাপও GPL-3। গোপনীয়তা: `privacy.md`।
@@ -25,16 +40,16 @@ YouTube ঘন ঘন বদলায়। `app/build.gradle.kts`-এ NewPipeEx
 ```
 com.tubex.app
 ├── TubeXApp.kt, MainActivity.kt     অ্যাপ এন্ট্রি পয়েন্ট
-├── util/            Lang (বাংলা/ইংরেজি স্ট্রিং), TextUtil, Format (সংখ্যা/সময়/URL ফরম্যাট)
+├── util/            Lang (L.t — ভাষা বদল), StringIds (জেনারেটেড), TextUtil, Format (সংখ্যা/সময়/URL ফরম্যাট)
 ├── data/
 │   ├── model/       ডোমেইন মডেল (VideoItem, ChannelData, CommentItem …)
 │   ├── local/       Room: AppDb, AppDao, entity/ + Prefs (SharedPreferences)
-│   ├── remote/      YtRepository (NewPipe Extractor), Extras (SponsorBlock/DeArrow), MyDownloader
+│   ├── remote/      YtRepository (NewPipe Extractor), Extras (SponsorBlock/DeArrow), MyDownloader, Retry (সাময়িক ত্রুটিতে পুনরায় চেষ্টা)
 │   ├── cache/       AvatarCache, SubsCache, FeedCache, StreamInfoCache
 │   ├── potoken/     PoTokenProviderImpl, PoTokenWebView, JavaScriptUtil (YouTube BotGuard/poToken; assets/po_token.html)
 │   ├── backup/      ProfileBackup, NewPipeImport
 │   ├── recommend/   Recommender, Blocks
-│   └── search/      SearchFilter
+│   └── search/      SearchFilter, ChannelSearch, HomePlaylists …
 ├── viewmodel/       MainViewModel, CastController, CommentsController, PlaylistsController, PlayQueue, ProfileSettings, UiModels
 ├── ui/
 │   ├── theme/       রং, Palette, YtTheme
@@ -42,7 +57,7 @@ com.tubex.app
 │   ├── navigation/  PredictiveBack
 │   ├── main/        YtApp, MainScaffold, BackPreviews
 │   ├── library/     LibraryScreen, SubsTab, HistoryFavorites, PlaylistsSection, DownloadsSection, LibraryComponents
-│   ├── settings/    SettingsScreen, SettingsPage, AboutSection, SettingsComponents
+│   ├── settings/    SettingsScreen, SettingsPage, ProfileDashboard, AboutSection, SettingsComponents
 │   └── home/ · channel/ · playlist/ · splash/   স্ক্রিন
 ├── player/
 │   ├── PlayerHolder.kt

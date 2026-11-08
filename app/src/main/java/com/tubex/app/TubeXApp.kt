@@ -18,6 +18,7 @@ class TubeXApp : Application() {
     override fun onCreate() {
         super.onCreate()
         val p = Prefs(this)
+        L.init(this)
         L.apply(p.lang)
         NewPipe.init(
             MyDownloader.create(),

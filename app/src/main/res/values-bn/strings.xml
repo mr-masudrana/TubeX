@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">TubeX</string>
+    <!-- কিউ UI ও রিকমেন্ডেশন ড্যাশবোর্ড -->
+    <string name="all_data_stays_on_this_phone" formatted="false">সব ডেটা শুধু এই ফোনে থাকে। এখানে দেখুন অ্যাপ আপনার সম্পর্কে কী শিখেছে — আর চাইলে বদলে দিন।</string>
+    <string name="topics" formatted="false">বিষয়</string>
+    <string name="blocked" formatted="false">ব্লক</string>
+    <string name="nothing_learned_yet_watch_a_few" formatted="false">এখনো কিছু শেখেনি — কয়েকটি ভিডিও দেখুন বা সার্চ করুন।</string>
+    <string name="when_you_watch_what" formatted="false">কখন কী দেখেন</string>
+    <string name="your_tastes_differ_by_weekday_weekend" formatted="false">কর্মদিবস/ছুটির দিন ও দিনের সময় অনুযায়ী আপনার আলাদা পছন্দ। ঘরে ট্যাপ করুন।</string>
+    <string name="not_enough_data_for_this_time" formatted="false">{0}: এই সময়ের জন্য এখনো যথেষ্ট ডেটা নেই।</string>
+    <string name="str_008" formatted="false">{0}: {1}</string>
+    <string name="favorite_channels" formatted="false">প্রিয় চ্যানেল</string>
+    <string name="favorite_topics" formatted="false">প্রিয় বিষয়</string>
+    <string name="shown_less_right_now" formatted="false">এখন কম দেখানো হচ্ছে</string>
+    <string name="boredom_appeared_4_times_in_your" formatted="false">বিরক্তি: সাম্প্রতিক ১০টি ভিডিওর মধ্যে ৪+ বার এসেছে, তাই সাময়িক কম আসবে:</string>
+    <string name="not_interested" formatted="false">আগ্রহ নেই: {0}</string>
+    <string name="restore_to_normal" formatted="false">আবার স্বাভাবিক করুন</string>
+    <string name="hide" formatted="false">লুকান</string>
+    <string name="how_does_the_app_learn" formatted="false">অ্যাপ কীভাবে শেখে?</string>
+    <string name="watching_50_90_of_a_video" formatted="false">• ভিডিও ৫০%/৯০% দেখলে স্কোর বাড়ে, দ্রুত স্কিপ করলে কমে</string>
+    <string name="it_also_learns_from_favorites_subscripti" formatted="false">• ফেভারিট, সাবস্ক্রাইব ও সার্চ থেকেও শেখে</string>
+    <string name="not_interested_lowers_that_topic_channel" formatted="false">• \"আগ্রহ নেই\" দিলে ওই বিষয়/চ্যানেলের স্কোর কমে</string>
+    <string name="scores_halve_every_14_days_so" formatted="false">• স্কোর প্রতি ১৪ দিনে অর্ধেক হয়, তাই পুরোনো আগ্রহ ধীরে মিলিয়ে যায়</string>
+    <string name="watching_the_same_topic_repeatedly_shows" formatted="false">• একই বিষয় বারবার দেখলে সাময়িক কম দেখানো হয়, যাতে ফিড একঘেয়ে না হয়</string>
+    <string name="video_card_why_suggested_shows_the" formatted="false">• ভিডিও কার্ডের ⋮ → \"কেন সাজেস্ট হলো?\" থেকে প্রতিটি সাজেশনের কারণ দেখা যায়</string>
+    <string name="channel" formatted="false">চ্যানেল {0}</string>
+    <string name="afternoon" formatted="false">দুপুর</string>
+    <string name="current_time" formatted="false">• = এখনকার সময়</string>
+    <string name="show_less" formatted="false">কম দেখান</string>
+    <string name="forget" formatted="false">ভুলে যান</string>
+    <string name="videos" formatted="false">{0}টি ভিডিও</string>
+    <string name="hold_drag_to_reorder_swipe_to" formatted="false">⠿ ধরে টেনে সাজান, পাশে সোয়াইপ করে সরান</string>
+    <string name="drag_to_reorder" formatted="false">টেনে সাজান</string>
+    <string name="removed" formatted="false">“{0}” সরানো হয়েছে</string>
+    <string name="undo" formatted="false">পূর্বাবস্থা</string>
+    <string name="this_suggestion_is_made_on_this" formatted="false">এই সাজেশন শুধু এই ফোনে, আপনার দেখার ধরন থেকে তৈরি। সেটিংস → রিকমেন্ডেশন প্রোফাইল থেকে বদলাতে পারেন।</string>
+    <string name="new_upload" formatted="false">নতুন আপলোড</string>
+    <string name="forgotten" formatted="false">ভুলে গেছে</string>
+    <string name="influence_reduced" formatted="false">প্রভাব কমানো হয়েছে</string>
+    <string name="couldn_t_load_channel" formatted="false">চ্যানেল লোড করা যায়নি</string>
+    <string name="subscribed" formatted="false">সাবস্ক্রাইবড</string>
+    <string name="subscribe" formatted="false">সাবস্ক্রাইব</string>
+    <string name="video" formatted="false">ভিডিও</string>
+    <string name="audio_stream_not_found" formatted="false">অডিও স্ট্রিম পাওয়া যায়নি</string>
+    <string name="video_stream_not_found" formatted="false">ভিডিও স্ট্রিম পাওয়া যায়নি</string>
+    <string name="empty_response" formatted="false">খালি উত্তর</string>
+    <string name="couldn_t_determine_file_size" formatted="false">ফাইলের সাইজ জানা যায়নি</string>
+    <string name="download_stalled" formatted="false">ডাউনলোড আটকে গেছে</string>
+    <string name="downloading" formatted="false">ডাউনলোড চলছে</string>
+    <string name="download" formatted="false">ডাউনলোড</string>
+    <string name="video_audio_merged" formatted="false">ভিডিও + অডিও মার্জ</string>
+    <string name="webm_video_audio_merged" formatted="false">WebM • ভিডিও + অডিও মার্জ</string>
+    <string name="mp4_av1_smaller_file_merged" formatted="false">MP4 • AV1 • ছোট ফাইল, মার্জ</string>
+    <string name="direct_no_merge" formatted="false">সরাসরি (মার্জ ছাড়া)</string>
+    <string name="audio_only" formatted="false">শুধু অডিও</string>
+    <string name="this_is_already_in_the_download" formatted="false">এটি আগে থেকেই ডাউনলোড তালিকায় আছে</string>
+    <string name="s" formatted="false">" সে"</string>
+    <string name="more_settings" formatted="false">আরও সেটিংস</string>
+    <string name="you_haven_t_subscribed_to_any" formatted="false">এখনো কোনো চ্যানেল সাবস্ক্রাইব করেননি</string>
+    <string name="refresh" formatted="false">রিফ্রেশ</string>
+    <string name="history" formatted="false">ইতিহাস</string>
+    <string name="favorites" formatted="false">ফেভারিট</string>
+    <string name="playlists" formatted="false">প্লেলিস্ট</string>
+    <string name="history_is_empty" formatted="false">ইতিহাস খালি</string>
+    <string name="no_favorites" formatted="false">কোনো ফেভারিট নেই</string>
+    <string name="new_playlist" formatted="false">নতুন প্লেলিস্ট</string>
+    <string name="create" formatted="false">তৈরি</string>
+    <string name="no_playlists" formatted="false">কোনো প্লেলিস্ট নেই</string>
+    <string name="videos_2" formatted="false">{0} টি ভিডিও</string>
+    <string name="play_all" formatted="false">সব চালান</string>
+    <string name="shuffle" formatted="false">শাফল</string>
+    <string name="playlist_is_empty_add_videos_from" formatted="false">প্লেলিস্ট খালি — ভিডিও পেজ থেকে যোগ করুন</string>
+    <string name="no_downloads" formatted="false">কোনো ডাউনলোড নেই</string>
+    <string name="pause_all" formatted="false">সব থামান</string>
+    <string name="start_all" formatted="false">সব শুরু করুন</string>
+    <string name="audio" formatted="false">অডিও</string>
+    <string name="waiting_in_queue" formatted="false">কিউতে অপেক্ষায়</string>
+    <string name="downloading_2" formatted="false">ডাউনলোড হচ্ছে {0}%</string>
+    <string name="paused" formatted="false">থামানো ({0}%)</string>
+    <string name="done" formatted="false">সম্পন্ন</string>
+    <string name="file_not_found" formatted="false">ফাইল পাওয়া যায়নি</string>
+    <string name="merging" formatted="false">মার্জ হচ্ছে…</string>
+    <string name="failed_try_again" formatted="false">ব্যর্থ — আবার চেষ্টা করুন</string>
+    <string name="sleep_timer_playback_stopped" formatted="false">স্লিপ টাইমার: প্লেব্যাক বন্ধ</string>
+    <string name="playback_error" formatted="false">প্লেব্যাক এরর</string>
+    <string name="sponsor_segment_skipped" formatted="false">স্পন্সর অংশ বাদ দেওয়া হয়েছে</string>
+    <string name="couldn_t_load" formatted="false">লোড করা যায়নি</string>
+    <string name="no_videos_found" formatted="false">কোনো ভিডিও পাওয়া যায়নি</string>
+    <string name="added_to_queue" formatted="false">কিউতে যোগ হয়েছে</string>
+    <string name="couldn_t_play_the_video" formatted="false">ভিডিও চালানো যায়নি</string>
+    <string name="hidden" formatted="false">লুকানো হয়েছে</string>
+    <string name="check_started_the_first_time_current" formatted="false">চেক শুরু হয়েছে। প্রথমবার শুধু বর্তমান ভিডিওগুলো \"দেখা\" হিসেবে ধরা হয়।</string>
+    <string name="this_video_can_t_be_cast" formatted="false">এই ভিডিও কাস্ট করা যাবে না</string>
+    <string name="profile_reset" formatted="false">প্রোফাইল রিসেট হয়েছে</string>
+    <string name="history_cleared" formatted="false">ইতিহাস মুছে গেছে</string>
+    <string name="already_added" formatted="false">আগে থেকেই আছে</string>
+    <string name="added_to_playlist" formatted="false">প্লেলিস্টে যোগ হয়েছে</string>
+    <string name="imported_channels_and_history_items" formatted="false">{0} টি চ্যানেল ও {1} টি ইতিহাস ইম্পোর্ট হয়েছে</string>
+    <string name="imported_channels" formatted="false">{0} টি চ্যানেল ইম্পোর্ট হয়েছে</string>
+    <string name="import_failed" formatted="false">ইম্পোর্ট ব্যর্থ: {0}</string>
+    <string name="newpipe_db_not_found_in_the" formatted="false">ZIP-এ newpipe.db পাওয়া যায়নি</string>
+    <string name="profile_exported" formatted="false">প্রোফাইল এক্সপোর্ট হয়েছে</string>
+    <string name="export_failed" formatted="false">এক্সপোর্ট ব্যর্থ: {0}</string>
+    <string name="this_is_not_a_tubex_profile" formatted="false">এটি TubeX-এর প্রোফাইল ফাইল নয়</string>
+    <string name="profile_imported" formatted="false">প্রোফাইল ইম্পোর্ট হয়েছে</string>
+    <string name="added_to_download_queue" formatted="false">ডাউনলোড কিউতে যোগ হয়েছে</string>
+    <string name="download_failed" formatted="false">ডাউনলোড ব্যর্থ</string>
+    <string name="video_audio_track_not_found" formatted="false">ভিডিও/অডিও ট্র্যাক পাওয়া যায়নি</string>
+    <string name="new_video" formatted="false">নতুন ভিডিও</string>
+    <string name="new_videos" formatted="false">{0} টি নতুন ভিডিও</string>
+    <string name="subtitles" formatted="false">সাবটাইটেল</string>
+    <string name="small" formatted="false">ছোট</string>
+    <string name="medium" formatted="false">মাঝারি</string>
+    <string name="large" formatted="false">বড়</string>
+    <string name="color" formatted="false">রঙ</string>
+    <string name="white" formatted="false">সাদা</string>
+    <string name="yellow" formatted="false">হলুদ</string>
+    <string name="green" formatted="false">সবুজ</string>
+    <string name="blue" formatted="false">নীল</string>
+    <string name="background" formatted="false">ব্যাকগ্রাউন্ড</string>
+    <string name="none" formatted="false">নেই</string>
+    <string name="semi_transparent" formatted="false">আধা-স্বচ্ছ</string>
+    <string name="black" formatted="false">কালো</string>
+    <string name="off" formatted="false">বন্ধ</string>
+    <string name="just_now" formatted="false">এইমাত্র</string>
+    <string name="min_ago" formatted="false">{0} মিনিট আগে</string>
+    <string name="hr_ago" formatted="false">{0} ঘণ্টা আগে</string>
+    <string name="days_ago" formatted="false">{0} দিন আগে</string>
+    <string name="mo_ago" formatted="false">{0} মাস আগে</string>
+    <string name="yr_ago" formatted="false">{0} বছর আগে</string>
+    <string name="views" formatted="false">{0} ভিউ</string>
+    <string name="subscribers" formatted="false">{0} সাবস্ক্রাইবার</string>
+    <string name="description" formatted="false">বিবরণ</string>
+    <string name="views_2" formatted="false">ভিউ</string>
+    <string name="likes" formatted="false">লাইক</string>
+    <string name="dislikes" formatted="false">ডিসলাইক</string>
+    <string name="published" formatted="false">প্রকাশ</string>
+    <string name="no_description" formatted="false">কোনো বিবরণ নেই</string>
+    <string name="more" formatted="false">আরও দেখুন</string>
+    <string name="muted" formatted="false">মিউট</string>
+    <string name="unmuted" formatted="false">আনমিউট</string>
+    <string name="autoplay_on" formatted="false">অটোপ্লে: চালু</string>
+    <string name="autoplay_off" formatted="false">অটোপ্লে: বন্ধ</string>
+    <string name="auto_generated" formatted="false">" (স্বয়ংক্রিয়)"</string>
+    <string name="offline_downloaded" formatted="false">অফলাইন (ডাউনলোড করা)</string>
+    <string name="add_to_playlist" formatted="false">প্লেলিস্টে যোগ</string>
+    <string name="queue" formatted="false">কিউ</string>
+    <string name="share" formatted="false">শেয়ার</string>
+    <string name="share_channel" formatted="false">চ্যানেল শেয়ার</string>
+    <string name="couldn_t_load_playlist" formatted="false">প্লেলিস্ট লোড করা যায়নি</string>
+    <string name="save_to_library" formatted="false">লাইব্রেরিতে সেভ</string>
+    <string name="saving" formatted="false">সেভ হচ্ছে…</string>
+    <string name="saved_to_library" formatted="false">\"{0}\" লাইব্রেরিতে সেভ হয়েছে</string>
+    <string name="youtube_playlist_link" formatted="false">ইউটিউব প্লেলিস্ট লিংক</string>
+    <string name="open_link" formatted="false">লিংক খুলুন</string>
+    <string name="copy_link" formatted="false">লিংক কপি</string>
+    <string name="link_copied" formatted="false">লিংক কপি হয়েছে</string>
+    <string name="open_in_browser" formatted="false">ব্রাউজারে খুলুন</string>
+    <string name="chapters" formatted="false">অধ্যায়</string>
+    <string name="related_to_what_you_watched_recently" formatted="false">আপনার সাম্প্রতিক দেখার সাথে সম্পর্কিত</string>
+    <string name="comments" formatted="false">মন্তব্য</string>
+    <string name="loading" formatted="false">লোড হচ্ছে…</string>
+    <string name="no_comments_or_comments_are_turned" formatted="false">মন্তব্য নেই বা বন্ধ আছে</string>
+    <string name="add_to_playlist_2" formatted="false">প্লেলিস্টে যোগ করুন</string>
+    <string name="items" formatted="false">{0} টি</string>
+    <string name="playback_speed" formatted="false">প্লেব্যাক গতি</string>
+    <string name="video_quality" formatted="false">ভিডিও কোয়ালিটি</string>
+    <string name="sleep_timer" formatted="false">স্লিপ টাইমার</string>
+    <string name="end_of_video" formatted="false">ভিডিও শেষে</string>
+    <string name="min" formatted="false">{0} মি</string>
+    <string name="on_stops_in_about_minutes" formatted="false">চালু আছে — প্রায় {0} মিনিট পরে থামবে</string>
+    <string name="repeat" formatted="false">রিপিট</string>
+    <string name="one_video" formatted="false">একটি ভিডিও</string>
+    <string name="plays_random_videos_from_the_queue" formatted="false">কিউ থেকে এলোমেলো ভিডিও চলবে</string>
+    <string name="plays_without_video_saves_data" formatted="false">ভিডিও ছাড়া চলবে, ডেটা বাঁচবে</string>
+    <string name="skip_silence" formatted="false">নীরবতা বাদ (Skip Silence)</string>
+    <string name="skips_silent_gaps_in_speech" formatted="false">কথার ফাঁকের নীরব অংশ বাদ যাবে</string>
+    <string name="no_download_options_available" formatted="false">ডাউনলোডের কোনো অপশন পাওয়া যায়নি</string>
+    <string name="queue_is_empty_use_play_next" formatted="false">কিউ খালি। ভিডিও কার্ডের ⋮ মেনু থেকে পরে চালান বা কিউতে যোগ করুন।</string>
+    <string name="clear_queue" formatted="false">কিউ খালি করুন</string>
+    <string name="weekend" formatted="false">ছুটির দিন</string>
+    <string name="weekday" formatted="false">কর্মদিবস</string>
+    <string name="morning" formatted="false">সকাল</string>
+    <string name="afternoon_2" formatted="false">দুপুর/বিকেল</string>
+    <string name="evening" formatted="false">সন্ধ্যা</string>
+    <string name="night" formatted="false">রাত</string>
+    <string name="you_often_watch_the_channel" formatted="false">আপনি \"{0}\" চ্যানেল প্রায়ই দেখেন</string>
+    <string name="your_pick_at_this_time" formatted="false">এই সময়ে ({0}) আপনার পছন্দ: {1}</string>
+    <string name="a_topic_you_re_interested_in" formatted="false">আপনার আগ্রহের বিষয়: {0}</string>
+    <string name="a_channel_you_subscribe_to" formatted="false">আপনার সাবস্ক্রাইব করা চ্যানেল</string>
+    <string name="explore_something_new_for_you" formatted="false">এক্সপ্লোর: আপনার জন্য নতুন কিছু</string>
+    <string name="popular_now" formatted="false">এখন জনপ্রিয়</string>
+    <string name="language" formatted="false">ভাষা / Language</string>
+    <string name="bangla" formatted="false">বাংলা</string>
+    <string name="system" formatted="false">সিস্টেম</string>
+    <string name="theme" formatted="false">থিম</string>
+    <string name="playback" formatted="false">প্লেব্যাক</string>
+    <string name="automatically_skips_sponsor_intro_and_ou" formatted="false">স্পন্সর, ইন্ট্রো, আউট্রো অংশ নিজে বাদ দেয়</string>
+    <string name="generates_youtube_s_integrity_token_keep" formatted="false">YouTube-এর যাচাই টোকেন তৈরি করে; ভিডিও না চললে বা \"বট\" ত্রুটি এলে চালু রাখুন</string>
+    <string name="shows_an_estimated_dislike_count" formatted="false">ডিসলাইকের আনুমানিক সংখ্যা দেখায়</string>
+    <string name="audio_only_default" formatted="false">শুধু অডিও (ডিফল্ট)</string>
+    <string name="plays_sound_only_saving_data" formatted="false">ভিডিও ছাড়া শুধু শব্দ চলবে, ডেটা বাঁচবে</string>
+    <string name="skip_silence_2" formatted="false">নীরবতা বাদ</string>
+    <string name="auto_bangla_audio" formatted="false">বাংলা অডিও অটো</string>
+    <string name="clear_watch_history" formatted="false">দেখার ইতিহাস মুছবেন?</string>
+    <string name="clear_search_history" formatted="false">সার্চ ইতিহাস মুছবেন?</string>
+    <string name="all_watch_history_will_be_deleted" formatted="false">সব দেখার ইতিহাস মুছে যাবে এবং ভিডিওগুলো আর শেষ জায়গা থেকে চালু হবে না। এটা আর ফেরানো যাবে না।</string>
+    <string name="all_search_terms_will_be_deleted" formatted="false">সব সার্চের শব্দ মুছে যাবে। এটা আর ফেরানো যাবে না।</string>
+    <string name="delete_playlist_confirm_title" formatted="false">\"{0}\" মুছবেন?</string>
+    <string name="delete_playlist_confirm_body" formatted="false">প্লেলিস্ট ও এর সব ভিডিও তালিকা থেকে মুছে যাবে। এটা আর ফেরানো যাবে না।</string>
+    <string name="reset_profile_confirm_body" formatted="false">শেখা সব আগ্রহ মুছে যাবে। এটা আর ফেরানো যাবে না।</string>
+    <string name="delete" formatted="false">মুছে ফেলুন</string>
+    <string name="plays_in_bangla_automatically_when_a" formatted="false">বাংলা অডিও ট্র্যাক থাকলে ভিডিও নিজে বাংলায় চলবে</string>
+    <string name="default_video_quality" formatted="false">ডিফল্ট ভিডিও কোয়ালিটি</string>
+    <string name="wi_fi" formatted="false">ওয়াইফাই</string>
+    <string name="mobile_data" formatted="false">মোবাইল ডেটা</string>
+    <string name="youtube_links" formatted="false">YouTube লিংক</string>
+    <string name="to_open_youtube_com_and_youtu" formatted="false">youtube.com ও youtu.be লিংক TubeX-তে খুলতে \"ডিফল্টে খুলুন\" থেকে লিংকগুলো চালু করুন। শেয়ার মেনু থেকেও পাঠানো যায়।</string>
+    <string name="open_by_default_settings" formatted="false">ডিফল্টে খুলুন সেটিংস</string>
+    <string name="your_recommendation_profile" formatted="false">আপনার রিকমেন্ডেশন প্রোফাইল</string>
+    <string name="all_data_stays_on_this_phone_2" formatted="false">সব ডেটা শুধু এই ফোনে থাকে। এখানে দেখুন অ্যাপ আপনার সম্পর্কে কী শিখেছে।</string>
+    <string name="nothing_learned_yet_watch_a_few_2" formatted="false">এখনো কিছু শেখেনি — কয়েকটি ভিডিও দেখুন।</string>
+    <string name="channel_2" formatted="false">চ্যানেল: {0}</string>
+    <string name="topic" formatted="false">বিষয়: {0}</string>
+    <string name="your_taste_right_now" formatted="false">এই সময়ের পছন্দ ({0})</string>
+    <string name="your_different_tastes_by_weekday_weekend" formatted="false">কর্মদিবস/ছুটির দিন ও দিনের সময় অনুযায়ী আপনার আলাদা পছন্দ।</string>
+    <string name="not_enough_data_for_this_time_2" formatted="false">এই সময়ের জন্য এখনো যথেষ্ট ডেটা নেই।</string>
+    <string name="new_video_notifications" formatted="false">নতুন ভিডিওর নোটিফিকেশন</string>
+    <string name="subscribed_channels" formatted="false">সাবস্ক্রাইব করা চ্যানেল</string>
+    <string name="checks_occasionally_in_the_background_an" formatted="false">ব্যাকগ্রাউন্ডে মাঝে মাঝে চেক করে নোটিফিকেশন দেয়</string>
+    <string name="every_h" formatted="false">প্রতি {0} ঘণ্টা</string>
+    <string name="check_now" formatted="false">এখনই চেক করুন</string>
+    <string name="replaces_clickbait_titles_and_thumbnails" formatted="false">ক্লিকবেইট টাইটেল ও থাম্বনেইল কমিউনিটির দেওয়া সংস্করণে বদলায়</string>
+    <string name="titles" formatted="false">টাইটেল</string>
+    <string name="shows_more_honest_titles" formatted="false">আরও সৎ টাইটেল দেখায়</string>
+    <string name="thumbnails" formatted="false">থাম্বনেইল</string>
+    <string name="thumbnails_taken_from_the_video_itself" formatted="false">ভিডিওর আসল দৃশ্য থেকে থাম্বনেইল</string>
+    <string name="block_list" formatted="false">ব্লক তালিকা</string>
+    <string name="you_can_also_choose_not_interested" formatted="false">ভিডিও কার্ডের ⋮ মেনু থেকেও \"আগ্রহ নেই\" বা ব্লক করা যায়।</string>
+    <string name="block_keyword" formatted="false">কিওয়ার্ড ব্লক</string>
+    <string name="add" formatted="false">যোগ</string>
+    <string name="keyword" formatted="false">কিওয়ার্ড: {0}</string>
+    <string name="video_2" formatted="false">ভিডিও: {0}</string>
+    <string name="remove" formatted="false">মুছুন</string>
+    <string name="data" formatted="false">ডেটা</string>
+    <string name="settings" formatted="false">সেটিংস</string>
+    <string name="view_all" formatted="false">সব দেখুন</string>
+    <string name="on" formatted="false">চালু</string>
+    <string name="play" formatted="false">প্লে করুন</string>
+    <string name="pause" formatted="false">থামান</string>
+    <string name="resume" formatted="false">আবার শুরু করুন</string>
+    <string name="retry" formatted="false">আবার চেষ্টা করুন</string>
+    <string name="save_to_gallery" formatted="false">গ্যালারিতে সেভ করুন</string>
+    <string name="share_2" formatted="false">শেয়ার করুন</string>
+    <string name="watch_online" formatted="false">অনলাইনে দেখুন</string>
+    <string name="select" formatted="false">বাছাই করুন</string>
+    <string name="details" formatted="false">বিস্তারিত</string>
+    <string name="close" formatted="false">বন্ধ করুন</string>
+    <string name="type" formatted="false">ধরন: {0}</string>
+    <string name="status" formatted="false">অবস্থা: {0}</string>
+    <string name="file_location" formatted="false">ফাইলের অবস্থান: {0}</string>
+    <string name="repeat_shuffle" formatted="false">রিপিট ও শাফল</string>
+    <string name="audio_2" formatted="false">অডিও সেটিং</string>
+    <string name="audio_only_skip_silence" formatted="false">শুধু অডিও, নীরবতা বাদ</string>
+    <string name="change_the_app_language" formatted="false">অ্যাপের ভাষা বদলান</string>
+    <string name="theme_colors_and_look" formatted="false">থিম, রঙ ও চেহারা</string>
+    <string name="autoplay_pip_floating_player_skip_sponso" formatted="false">অটোপ্লে, PiP, ভাসমান প্লেয়ার, স্পন্সর বাদ</string>
+    <string name="video_quality_and_data_saving" formatted="false">ভিডিওর মান ও ডেটা সাশ্রয়</string>
+    <string name="wi_fi_only_and_parallel_downloads" formatted="false">শুধু ওয়াইফাই ও একসাথে কয়টা ডাউনলোড</string>
+    <string name="search_and_watch_history" formatted="false">সার্চ ও দেখার ইতিহাস</string>
+    <string name="new_videos_from_subscribed_channels" formatted="false">সাবস্ক্রাইব করা চ্যানেলের নতুন ভিডিও</string>
+    <string name="fix_clickbait_titles_and_thumbnails" formatted="false">ক্লিকবেইট শিরোনাম ও থাম্বনেইল ঠিক করা</string>
+    <string name="how_youtube_links_open" formatted="false">YouTube লিংক খোলার ব্যবস্থা</string>
+    <string name="topics_you_re_interested_in" formatted="false">আপনার আগ্রহের বিষয়গুলো</string>
+    <string name="channels_and_words_to_hide" formatted="false">লুকাতে চাওয়া চ্যানেল ও শব্দ</string>
+    <string name="import_export_and_reset" formatted="false">ইম্পোর্ট, এক্সপোর্ট ও রিসেট</string>
+    <string name="version_and_updates" formatted="false">ভার্সন ও আপডেট</string>
+    <string name="about" formatted="false">অ্যাপ সম্পর্কে</string>
+    <string name="version_build" formatted="false">ভার্সন {0} (বিল্ড {1})</string>
+    <string name="check_for_updates" formatted="false">আপডেট চেক করুন</string>
+    <string name="checking" formatted="false">চেক করা হচ্ছে…</string>
+    <string name="you_re_on_the_latest_version" formatted="false">আপনি সর্বশেষ ভার্সনে আছেন</string>
+    <string name="new_version_available" formatted="false">নতুন ভার্সন {0} পাওয়া গেছে</string>
+    <string name="download_update" formatted="false">আপডেট ডাউনলোড করুন</string>
+    <string name="couldn_t_check_for_updates_no" formatted="false">আপডেট চেক করা যায়নি (ইন্টারনেট বা রিলিজ নেই)</string>
+    <string name="update_source_not_set_it_s" formatted="false">আপডেট সোর্স সেট নেই: GitHub Actions বিল্ডে নিজে সেট হয়, লোকালি -PupdateRepo=owner/repo দিন</string>
+    <string name="update_notifications" formatted="false">আপডেটের নোটিফিকেশন</string>
+    <string name="get_a_notification_and_an_in" formatted="false">নতুন ভার্সন এলে নোটিফিকেশন ও অ্যাপে পপআপ পাবেন (প্রতি ২৪ ঘণ্টায় চেক)</string>
+    <string name="later" formatted="false">পরে</string>
+    <string name="source_code_releases_page" formatted="false">সোর্স কোড / রিলিজ পেজ</string>
+    <string name="app_updates" formatted="false">অ্যাপ আপডেট</string>
+    <string name="tubex_update" formatted="false">TubeX আপডেট</string>
+    <string name="version_is_available_you_have" formatted="false">নতুন ভার্সন {0} এসেছে (আপনার ভার্সন {1})</string>
+    <string name="newpipe_import_subscriptions_json_or_bac" formatted="false">NewPipe ইম্পোর্ট (সাবস্ক্রিপশন JSON বা ব্যাকআপ ZIP: সাবস্ক্রিপশন + ইতিহাস)</string>
+    <string name="reset_recommendation_profile" formatted="false">রিকমেন্ডেশন প্রোফাইল রিসেট</string>
+    <string name="clear_watch_history_2" formatted="false">দেখার ইতিহাস মুছুন</string>
+    <string name="export_profile_subscriptions_playlists_h" formatted="false">প্রোফাইল এক্সপোর্ট (সাবস্ক্রিপশন, প্লেলিস্ট, ইতিহাস, রিকমেন্ডেশন)</string>
+    <string name="import_profile" formatted="false">প্রোফাইল ইম্পোর্ট</string>
+    <string name="home" formatted="false">হোম</string>
+    <string name="subscriptions" formatted="false">সাবস্ক্রিপশন</string>
+    <string name="library" formatted="false">লাইব্রেরি</string>
+    <string name="search" formatted="false">সার্চ করুন</string>
+    <string name="type_what_you_want_to_find" formatted="false">কী খুঁজতে চান লিখুন</string>
+    <string name="for_you" formatted="false">আপনার জন্য</string>
+    <string name="music" formatted="false">গান</string>
+    <string name="gaming" formatted="false">গেমিং</string>
+    <string name="news" formatted="false">খবর</string>
+    <string name="live" formatted="false">লাইভ</string>
+    <string name="cooking" formatted="false">রান্না</string>
+    <string name="cricket" formatted="false">ক্রিকেট</string>
+    <string name="continue_watching" formatted="false">দেখা চালিয়ে যান</string>
+    <string name="why_was_this_suggested" formatted="false">কেন সাজেস্ট হলো?</string>
+    <string name="play_next" formatted="false">পরে চালান</string>
+    <string name="add_to_queue" formatted="false">কিউতে যোগ</string>
+    <string name="not_interested_2" formatted="false">আগ্রহ নেই</string>
+    <string name="block_channel" formatted="false">\"{0}\" চ্যানেল ব্লক</string>
+    <string name="block_keyword_2" formatted="false">কিওয়ার্ড ব্লক…</string>
+    <string name="ok" formatted="false">ঠিক আছে</string>
+    <string name="videos_with_this_word_in_the" formatted="false">যে ভিডিওর টাইটেলে এই শব্দ থাকবে সেগুলো আর দেখাবে না।</string>
+    <string name="block" formatted="false">ব্লক করুন</string>
+    <string name="cancel" formatted="false">বাতিল</string>
+    <string name="no_playable_stream_found" formatted="false">কোনো প্লে করার মতো স্ট্রিম পাওয়া যায়নি</string>
+    <string name="dark" formatted="false">ডার্ক</string>
+    <string name="fit" formatted="false">ফিট</string>
+    <string name="zoom_crop" formatted="false">জুম (ক্রপ)</string>
+    <string name="stretch_to_fill" formatted="false">ফুল (স্ট্রেচ)</string>
+    <string name="oled_black" formatted="false">OLED কালো</string>
+    <string name="light" formatted="false">লাইট</string>
+    <string name="sort_by" formatted="false">সাজানো</string>
+    <string name="top" formatted="false">শীর্ষ</string>
+    <string name="newest" formatted="false">নতুন</string>
+    <string name="oldest" formatted="false">পুরনো</string>
+    <string name="sorted_among_the_loaded_comments" formatted="false">লোড হওয়া মন্তব্যের মধ্যে সাজানো হয়েছে</string>
+    <string name="hide_replies" formatted="false">উত্তর লুকান</string>
+    <string name="replies" formatted="false">{0} টি উত্তর</string>
+    <string name="view_replies" formatted="false">উত্তর দেখুন</string>
+    <string name="more_replies" formatted="false">আরও উত্তর</string>
+    <string name="floating_mini_player" formatted="false">ভাসমান মিনি প্লেয়ার</string>
+    <string name="keeps_playing_in_a_small_floating" formatted="false">ব্যাক করলে ভিডিও ছোট ভাসমান উইন্ডোতে চলতে থাকবে, টেনে সরানো যায়</string>
+    <string name="audio_track" formatted="false">অডিও ট্র্যাক</string>
+    <string name="couldn_t_load_subtitles_turned_off" formatted="false">সাবটাইটেল লোড হয়নি, বন্ধ করা হলো</string>
+    <string name="pip_playback" formatted="false">PiP প্লে</string>
+    <string name="downloads_running" formatted="false">{0} টি ডাউনলোড চলছে</string>
+    <string name="selected" formatted="false">{0} টি বাছাই করা</string>
+    <string name="autoplay" formatted="false">অটোপ্লে</string>
+    <string name="accent_color" formatted="false">অ্যাকসেন্ট রঙ</string>
+    <string name="audio_keeps_playing_when_you_leave" formatted="false">অ্যাপ থেকে বেরিয়ে গেলেও বা স্ক্রিন বন্ধ করলেও শব্দ চলতে থাকবে</string>
+    <string name="search_history" formatted="false">ইতিহাসে খুঁজুন</string>
+    <string name="simultaneous_downloads" formatted="false">একসাথে কয়টা ডাউনলোড চলবে</string>
+    <string name="waiting_for_wi_fi" formatted="false">ওয়াইফাইয়ের অপেক্ষায়</string>
+    <string name="watch_history_is_off_turn_it" formatted="false">ওয়াচ হিস্টরি বন্ধ আছে (সেটিংস থেকে চালু করুন)</string>
+    <string name="save_watch_history" formatted="false">ওয়াচ হিস্টরি সংরক্ষণ</string>
+    <string name="custom_color" formatted="false">কাস্টম রঙ</string>
+    <string name="nothing_found" formatted="false">কিছু পাওয়া যায়নি</string>
+    <string name="saved_to_gallery" formatted="false">গ্যালারিতে সেভ হয়েছে</string>
+    <string name="active_queued" formatted="false">চলছে / অপেক্ষায় ({0})</string>
+    <string name="appearance_theme" formatted="false">চেহারা ও থিম</string>
+    <string name="channel_3" formatted="false">চ্যানেল</string>
+    <string name="data_saver_quality" formatted="false">ডেটা সেভার ও কোয়ালিটি</string>
+    <string name="data_saver_mode" formatted="false">ডেটা সেভার মোড</string>
+    <string name="theme_default" formatted="false">থিমের ডিফল্ট</string>
+    <string name="newest_first" formatted="false">নতুন আগে</string>
+    <string name="name" formatted="false">নাম</string>
+    <string name="oldest_first" formatted="false">পুরনো আগে</string>
+    <string name="privacy_history" formatted="false">প্রাইভেসি ও ইতিহাস</string>
+    <string name="rename_playlist" formatted="false">প্লেলিস্টের নাম বদলান</string>
+    <string name="switches_between_dark_and_light_theme" formatted="false">ফোন ডার্ক মোডে থাকলে ডার্ক, নাহলে লাইট থিম নিজে বদলাবে</string>
+    <string name="when_off_watched_videos_aren_t" formatted="false">বন্ধ থাকলে দেখা ভিডিও ইতিহাসে যোগ হবে না (শেষ জায়গা থেকে চালুও হবে না)</string>
+    <string name="when_off_search_terms_aren_t" formatted="false">বন্ধ থাকলে সার্চের শব্দ মনে রাখা হবে না</string>
+    <string name="background_play" formatted="false">ব্যাকগ্রাউন্ড প্লে</string>
+    <string name="pressing_home_while_a_video_plays" formatted="false">ভিডিও চলার সময় হোম বাটন চাপলে ছোট উইন্ডোতে চলবে</string>
+    <string name="the_next_video_plays_automatically_when" formatted="false">ভিডিও শেষে পরের ভিডিও নিজে চলবে</string>
+    <string name="downloads_wait_on_mobile_data_and" formatted="false">মোবাইল ডেটায় ডাউনলোড থেমে থাকবে, ওয়াইফাই পেলে নিজে চলবে</string>
+    <string name="download_on_wi_fi_only" formatted="false">শুধু ওয়াইফাইয়ে ডাউনলোড</string>
+    <string name="share_failed" formatted="false">শেয়ার ব্যর্থ: {0}</string>
+    <string name="all" formatted="false">সব</string>
+    <string name="max_360p_on_every_network_and" formatted="false">সব নেটওয়ার্কে সর্বোচ্চ 360p এবং পরের ভিডিও আগাম লোড বন্ধ</string>
+    <string name="completed" formatted="false">সম্পন্ন ({0}) • {1}</string>
+    <string name="clear_search_history_2" formatted="false">সার্চ ইতিহাস মুছুন</string>
+    <string name="search_history_cleared" formatted="false">সার্চ ইতিহাস মুছে গেছে</string>
+    <string name="save_search_history" formatted="false">সার্চ হিস্টরি সংরক্ষণ</string>
+    <string name="follow_system_theme_auto" formatted="false">সিস্টেম থিম অনুসরণ (অটো)</string>
+    <string name="couldn_t_save" formatted="false">সেভ করা যায়নি</string>
+    <string name="save_failed" formatted="false">সেভ ব্যর্থ: {0}</string>
+    <string name="can_t_save_without_storage_permission" formatted="false">স্টোরেজ পারমিশন ছাড়া সেভ করা যাচ্ছে না</string>
+    <string name="filter" formatted="false">ফিল্টার</string>
+    <string name="clear_filters" formatted="false">ফিল্টার মুছুন</string>
+    <string name="upload_date" formatted="false">আপলোডের সময়</string>
+    <string name="duration" formatted="false">দৈর্ঘ্য</string>
+    <string name="sort_by_2" formatted="false">সাজান</string>
+    <string name="any_time" formatted="false">যেকোনো সময়</string>
+    <string name="today" formatted="false">আজ</string>
+    <string name="this_week" formatted="false">এই সপ্তাহ</string>
+    <string name="this_month" formatted="false">এই মাস</string>
+    <string name="this_year" formatted="false">এই বছর</string>
+    <string name="any_duration" formatted="false">যেকোনো দৈর্ঘ্য</string>
+    <string name="short_under_4_min" formatted="false">ছোট (৪ মিনিটের কম)</string>
+    <string name="medium_420_min" formatted="false">মাঝারি (৪–২০ মিনিট)</string>
+    <string name="long_over_20_min" formatted="false">লম্বা (২০ মিনিটের বেশি)</string>
+    <string name="relevance" formatted="false">প্রাসঙ্গিকতা</string>
+    <string name="most_viewed" formatted="false">সবচেয়ে বেশি দেখা</string>
+    <string name="no_videos_match_the_filters" formatted="false">ফিল্টারে কোনো ভিডিও মেলেনি</string>
+    <string name="results" formatted="false">{0} টি ফলাফল</string>
+    <string name="playlist" formatted="false">প্লেলিস্ট: {0}</string>
+    <string name="playlists_for_you" formatted="false">আপনার জন্য প্লেলিস্ট</string>
+    <string name="export_recommendations_only" formatted="false">শুধু রিকমেন্ডেশন এক্সপোর্ট</string>
+    <string name="import_recommendations_only" formatted="false">শুধু রিকমেন্ডেশন ইম্পোর্ট</string>
+    <string name="recommendation_profile_exported" formatted="false">রিকমেন্ডেশন প্রোফাইল এক্সপোর্ট হয়েছে</string>
+    <string name="recommendation_profile_imported" formatted="false">রিকমেন্ডেশন প্রোফাইল ইম্পোর্ট হয়েছে</string>
+    <!-- SponsorBlock ক্যাটাগরি ও ডাউনলোড সময়সীমা -->
+    <string name="sponsor_category" formatted="false">স্পন্সর</string>
+    <string name="self_promotion" formatted="false">নিজের প্রচার</string>
+    <string name="subscribe_like_reminders" formatted="false">সাবস্ক্রাইব/লাইকের অনুরোধ</string>
+    <string name="intro" formatted="false">ইন্ট্রো</string>
+    <string name="outro" formatted="false">আউট্রো</string>
+    <string name="filler_category" formatted="false">ফিলার (অপ্রয়োজনীয় কথা)</string>
+    <string name="segments_to_skip" formatted="false">যেসব অংশ বাদ যাবে</string>
+    <string name="filler_warning" formatted="false">ফিলার চালু করলে আসল কথাও কেটে যেতে পারে</string>
+    <string name="download_timeout_paused" formatted="false">সিস্টেমের সময়সীমা শেষ — ডাউনলোড থামানো হয়েছে। অ্যাপ খুলে আবার চালু করুন।</string>
+</resources>

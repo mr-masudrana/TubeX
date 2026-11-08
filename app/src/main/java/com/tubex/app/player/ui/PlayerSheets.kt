@@ -6,6 +6,17 @@ import com.tubex.app.ui.theme.Chip
 import com.tubex.app.ui.theme.Sub
 import com.tubex.app.ui.theme.YtRed
 import com.tubex.app.viewmodel.MainViewModel
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.zIndex
+import coil.compose.AsyncImage
+import com.tubex.app.viewmodel.PlayQueue
+import kotlinx.coroutines.delay
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -243,39 +254,126 @@ internal fun captionStyle(color: Int, bg: Int): CaptionStyleCompat {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun QueueSheet(vm: MainViewModel, onDismiss: () -> Unit) {
+    val items = vm.queueItems
+    val listState = rememberLazyListState()
+    // একই ভিডিও দুইবার থাকতে পারে, তাই কী = url + কততম বার
+    val keys = remember(items) {
+        val seen = HashMap<String, Int>()
+        items.map { q -> val n = (seen[q.url] ?: 0) + 1; seen[q.url] = n; "${q.url}#$n" }
+    }
+    var undo by remember { mutableStateOf<PlayQueue.Removed?>(null) }
+    var dragKey by remember { mutableStateOf<String?>(null) }
+    var dragDelta by remember { mutableFloatStateOf(0f) }
+    var expectedIndex by remember { mutableIntStateOf(-1) }   // সোয়াপের পর লেআউট হালনাগাদ হওয়া পর্যন্ত অপেক্ষা
+
+    LaunchedEffect(Unit) { if (vm.queueCurrent > 0) listState.scrollToItem(vm.queueCurrent - 1) }
+    LaunchedEffect(undo) { if (undo != null) { delay(5000); undo = null } }
+
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Chip) {
         Text(
             vm.queueTitle?.let { L.f("প্লেলিস্ট: {0}", it) } ?: L.t("কিউ"),
             fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 4.dp)
+            modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 0.dp)
+        )
+        if (items.isNotEmpty()) Text(
+            L.f("{0}টি ভিডিও", items.size) + if (items.size > 1) " · " + L.t("⠿ ধরে টেনে সাজান, পাশে সোয়াইপ করে সরান") else "",
+            color = Sub, fontSize = 12.sp, modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 4.dp)
         )
         OptionRow(L.t("রিপিট"), listOf(0, 1, 2), vm.repeat, { listOf(L.t("বন্ধ"), L.t("কিউ"), L.t("একটি ভিডিও"))[it] }) { vm.chooseRepeat(it) }
         ToggleRow(L.t("শাফল"), L.t("কিউ থেকে এলোমেলো ভিডিও চলবে"), vm.shuffle) { vm.toggleShuffle(it) }
-        if (vm.queueItems.isEmpty()) Text(
+        if (items.isEmpty()) Text(
             L.t("কিউ খালি। ভিডিও কার্ডের ⋮ মেনু থেকে পরে চালান বা কিউতে যোগ করুন।"),
             color = Sub, fontSize = 13.sp, modifier = Modifier.padding(16.dp)
         )
-        LazyColumn(Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
-            items(vm.queueItems.size) { i ->
-                val q = vm.queueItems[i]
-                Row(
-                    Modifier.fillMaxWidth()
-                        .background(if (i == vm.queueIndex) YtRed.copy(alpha = 0.15f) else Color.Transparent)
-                        .clickable { vm.queuePlayAt(i) }.padding(start = 16.dp, top = 4.dp, bottom = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("${i + 1}", color = Sub, fontSize = 12.sp, modifier = Modifier.width(24.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(q.title, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(q.channel, color = Sub, fontSize = 12.sp, maxLines = 1)
+        LazyColumn(state = listState, modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
+            itemsIndexed(items, key = { i, _ -> keys[i] }) { i, q ->
+                val key = keys[i]
+                val dragging = dragKey == key
+                val pos = rememberUpdatedState(i)
+                val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = { v ->
+                    if (v == SwipeToDismissBoxValue.Settled) false
+                    else { vm.queueRemove(pos.value)?.let { undo = it }; true }
+                })
+                SwipeToDismissBox(
+                    state = dismissState,
+                    gesturesEnabled = dragKey == null,
+                    modifier = Modifier
+                        .zIndex(if (dragging) 1f else 0f)
+                        .graphicsLayer { translationY = if (dragging) dragDelta else 0f; shadowElevation = if (dragging) 12f else 0f },
+                    backgroundContent = {
+                        Box(
+                            Modifier.fillMaxSize().background(YtRed.copy(alpha = 0.85f)).padding(horizontal = 20.dp),
+                            contentAlignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) Alignment.CenterStart else Alignment.CenterEnd
+                        ) { Icon(Icons.Filled.Delete, null, tint = Color.White) }
                     }
-                    IconButton(onClick = { vm.queueMove(i, -1) }, enabled = i > 0) { Icon(Icons.Filled.KeyboardArrowUp, null) }
-                    IconButton(onClick = { vm.queueMove(i, 1) }, enabled = i < vm.queueItems.lastIndex) { Icon(Icons.Filled.KeyboardArrowDown, null) }
-                    IconButton(onClick = { vm.queueRemove(i) }) { Icon(Icons.Filled.Close, null) }
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth().background(Chip)
+                            .background(if (i == vm.queueCurrent) YtRed.copy(alpha = 0.15f) else Color.Transparent)
+                            .clickable { vm.queuePlayAt(i) }.padding(start = 12.dp, top = 6.dp, bottom = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                            if (i == vm.queueCurrent) Icon(Icons.Filled.PlayArrow, null, tint = YtRed, modifier = Modifier.size(18.dp))
+                            else Text("${i + 1}", color = Sub, fontSize = 12.sp)
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        AsyncImage(
+                            model = q.thumb, contentDescription = null, contentScale = ContentScale.Crop,
+                            modifier = Modifier.width(80.dp).aspectRatio(16f / 9f).clip(RoundedCornerShape(6.dp)).background(Bg)
+                        )
+                        Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
+                            Text(q.title, fontSize = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                                fontWeight = if (i == vm.queueCurrent) FontWeight.SemiBold else FontWeight.Normal)
+                            Text(q.channel, color = Sub, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                        // ড্র্যাগ হ্যান্ডেল: চেপে ধরে টানলে ক্রম বদলায়
+                        Icon(
+                            Icons.Filled.DragHandle, contentDescription = L.t("টেনে সাজান"), tint = Sub,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp).size(28.dp)
+                                .pointerInput(key) {
+                                    detectDragGesturesAfterLongPress(
+                                        onDragStart = { dragKey = key; dragDelta = 0f; expectedIndex = -1 },
+                                        onDragEnd = { dragKey = null; dragDelta = 0f; expectedIndex = -1 },
+                                        onDragCancel = { dragKey = null; dragDelta = 0f; expectedIndex = -1 },
+                                        onDrag = { change, amount ->
+                                            change.consume()
+                                            dragDelta += amount.y
+                                            val visible = listState.layoutInfo.visibleItemsInfo
+                                            val info = visible.firstOrNull { it.key == key }
+                                            if (info != null && (expectedIndex < 0 || info.index == expectedIndex)) {
+                                                expectedIndex = -1
+                                                val center = info.offset + info.size / 2f + dragDelta
+                                                val target = visible.firstOrNull {
+                                                    it.key != key && center >= it.offset && center < it.offset + it.size
+                                                }
+                                                if (target != null) {
+                                                    vm.queueMoveTo(info.index, target.index)
+                                                    // নতুন জায়গায় আইটেম যে অফসেটে বসবে, তার সাথে মিলিয়ে ড্র্যাগের দূরত্ব ঠিক করা
+                                                    dragDelta += if (target.index > info.index) -target.size.toFloat() else target.size.toFloat()
+                                                    expectedIndex = target.index
+                                                }
+                                            }
+                                        }
+                                    )
+                                }
+                        )
+                    }
                 }
             }
         }
-        if (vm.queueItems.isNotEmpty()) TextButton(onClick = { vm.queueClear() }, modifier = Modifier.padding(horizontal = 8.dp)) {
+        undo?.let { r ->
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
+                    .clip(RoundedCornerShape(8.dp)).background(Bg).padding(start = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(L.f("\u201c{0}\u201d সরানো হয়েছে", r.item.title), fontSize = 13.sp, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                TextButton(onClick = { vm.queueRestore(r); undo = null }) { Text(L.t("পূর্বাবস্থা")) }
+            }
+        }
+        if (items.isNotEmpty()) TextButton(onClick = { vm.queueClear(); undo = null }, modifier = Modifier.padding(horizontal = 8.dp)) {
             Text(L.t("কিউ খালি করুন"))
         }
         Spacer(Modifier.height(16.dp))

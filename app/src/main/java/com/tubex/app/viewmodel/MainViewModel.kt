@@ -21,6 +21,7 @@ import com.tubex.app.data.model.PlaylistEntry
 import com.tubex.app.data.model.ChannelResult
 import com.tubex.app.data.model.VideoItem
 import com.tubex.app.data.recommend.Blocks
+import com.tubex.app.data.recommend.ProfileSummary
 import com.tubex.app.data.recommend.Recommender
 import com.tubex.app.data.remote.DeArrow
 import com.tubex.app.data.search.ChannelSearch
@@ -28,6 +29,7 @@ import com.tubex.app.data.search.HomePlaylists
 import com.tubex.app.data.search.PrefetchPlan
 import com.tubex.app.data.search.PlaylistLinks
 import com.tubex.app.data.remote.Extras
+import com.tubex.app.data.remote.SponsorCategories
 import com.tubex.app.data.remote.Segment
 import com.tubex.app.data.remote.YtRepository
 import com.tubex.app.download.DlOption
@@ -77,6 +79,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withPermit
@@ -109,6 +112,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     // সেটিংস
     var themeIndex by mutableStateOf(prefs.theme); private set
     var sponsorOn by mutableStateOf(prefs.sponsorBlock); private set
+    var sponsorCats by mutableStateOf(SponsorCategories.parse(prefs.sponsorCats)); private set
     var poTokenOn by mutableStateOf(prefs.poToken); private set
     var rydOn by mutableStateOf(prefs.ryd); private set
     var captionSizeIndex by mutableStateOf(prefs.captionSize); private set
@@ -248,6 +252,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     // রিকমেন্ডেশন ড্যাশবোর্ড
     var topInterests by mutableStateOf<List<Pair<String, Double>>>(emptyList()); private set
     var contextInterests by mutableStateOf<List<Pair<String, Double>>>(emptyList()); private set
+    var profile by mutableStateOf(ProfileSummary.EMPTY); private set
+    /** এখন "বিরক্তি"র কারণে সাময়িক কম দেখানো বিষয়/চ্যানেল ("kw:…" / "ch:…") */
+    var boredNow by mutableStateOf<List<String>>(emptyList()); private set
     var langMode by mutableStateOf(prefs.lang); private set
     var floatingMini by mutableStateOf(prefs.floatMini); private set
     var themeAuto by mutableStateOf(prefs.themeAuto); private set
@@ -276,6 +283,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val queue = PlayQueue()
     val queueItems get() = queue.items
     val queueIndex get() = queue.index
+    val queueCurrent get() = queue.currentIndex   // চলতি সারির পজিশন; কিউ থেকে মুছে ফেলা হলে -1
     val queueTitle get() = queue.title          // প্লেলিস্ট থেকে এলে তার নাম
     val shuffle get() = queue.shuffle
     val repeat get() = queue.repeat          // 0 বন্ধ, 1 কিউ, 2 একটি ভিডিও
@@ -320,8 +328,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             override fun onPlayerError(e: PlaybackException) {
                 val info = current
                 // ১ম এরর: স্ট্রিম URL মেয়াদোত্তীর্ণ (403) হতে পারে — নতুন তথ্য এনে একই জায়গা থেকে চালাই
-                if (info != null && recoveredUrl != info.url) {
-                    recoveredUrl = info.url
+                // (অনেকক্ষণ থামিয়ে রাখার পর URL আবার মেয়াদোত্তীর্ণ হলে ৬০ সেকেন্ড পরে আবার একবার চেষ্টা)
+                if (info != null && (recoveredUrl != info.url || System.currentTimeMillis() - recoveredAt > 60_000L)) {
+                    recoveredUrl = info.url; recoveredAt = System.currentTimeMillis()
                     val pos = player.currentPosition
                     streamCache.remove(info.url)
                     viewModelScope.launch {
@@ -455,10 +464,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val picked = Recommender.pickTopics(kwWeights, 4)
         val queries = picked.take(3) + (if (picked.size >= 2) listOf("${picked[0]} ${picked[1]}") else emptyList())
         // সাম্প্রতিক দেখার related: সবচেয়ে সাম্প্রতিকটি + আগের ১০টির মধ্যে একটি র‍্যান্ডম
-        val hist = history.value
+        // অ্যাপ খোলার ঠিক পরে StateFlow এখনো খালি থাকতে পারে (init থেকেই ফিড লোড হয়), তাই খালি হলে ডেটাবেস থেকে নিই
+        val hist = history.value.ifEmpty { dao.history().first() }
+        val subsNow = subs.value.ifEmpty { dao.subsOnce() }
         val relSrc = (listOfNotNull(hist.firstOrNull()?.url) + hist.drop(1).take(9).shuffled().take(1).map { it.url }).distinct()
         // সাবস্ক্রাইব করা চ্যানেলের তাজা ভিডিও (প্রতিবার ৩টি র‍্যান্ডম চ্যানেল)
-        val subSrc = subs.value.shuffled().take(3)
+        val subSrc = subsNow.shuffled().take(3)
         val (pools, relatedPool) = coroutineScope {
             val rel = relSrc.map { u ->
                 async { runCatching { YtRepository.related(YtRepository.streamInfo(u)) }.getOrDefault(emptyList()) }
@@ -478,8 +489,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val merged = (pools.flatten() + relatedPool).distinctBy { it.url }.filter { it.url !in exclude }
         val ranked = filterBlocked(
             Recommender.rank(
-                merged, interests, dao.watchedUrls().toSet(), history.value,
-                subs.value.map { it.name.lowercase() }.toSet(),
+                merged, interests, dao.watchedUrls().toSet(), hist,
+                subsNow.map { it.name.lowercase() }.toSet(),
                 related = relatedPool.map { it.url }.toSet(),
                 shown = shownCounts
             )
@@ -494,7 +505,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         feedJob?.cancel(); moreJob?.cancel(); loadingMore = false
         searchChannels = emptyList()
         if (!silent) cachedFeed("foryou")?.let { c ->
-            feedKind = 0; feedQuery = null
+            feedKind = 0; feedQuery = null; feedEnd = false
             isSearchResult = false; resetFilters()
             feed = c; error = null; prefetchTop(c)
             loading = false; feedLoading = false; refreshing = false
@@ -697,7 +708,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             ((queueItems.isNotEmpty() && (queueIndex + 1 < queueItems.size || shuffle || repeat == 1)) ||
                     related.any { it.url !in sessionPlayed && it.url != current?.url })
 
-    fun canPrev(): Boolean = (queueItems.isNotEmpty() && queueIndex > 0) || backStack.isNotEmpty()
+    fun canPrev(): Boolean = (queueItems.isNotEmpty() && queue.canBack) || backStack.isNotEmpty()
 
     /** অটোপ্লে: কিউ শেষ হলে বা কিউ না থাকলে সম্পর্কিত ভিডিওর প্রথম নতুনটা */
     private fun playRelatedNext(): Boolean {
@@ -732,8 +743,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         startPlay(q.url)
     }
 
-    fun queueRemove(i: Int) = queue.remove(i)
+    /** মোছা আইটেম ফেরত দেয়, যাতে UI "পূর্বাবস্থা" দেখাতে পারে */
+    fun queueRemove(i: Int): PlayQueue.Removed? = queue.remove(i)
+    fun queueRestore(r: PlayQueue.Removed) = queue.restore(r)
     fun queueMove(i: Int, delta: Int) = queue.move(i, delta)
+    fun queueMoveTo(from: Int, to: Int) = queue.moveTo(from, to)
     fun queueClear() = clearQueue()
     fun toggleShuffle(v: Boolean) = queue.setShuffle(v)
     fun chooseRepeat(m: Int) {
@@ -743,6 +757,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---------- দ্রুত লোডের জন্য ক্যাশ ও প্রি-ফেচ ----------
     private var playJob: Job? = null
+    private var recoveredAt = 0L
     private var recoveredUrl: String? = null     // যে ভিডিওর জন্য এরর-রিকভারি একবার চলেছে
     private var captionDropped = false
     private var playToken = 0
@@ -862,6 +877,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun playLocal(d: DownloadEntity) {
+        playGen++   // পেছনে চলা "লিংকের প্লেলিস্ট কিউতে তোলা" কাজ বাতিল হোক
         playJob?.cancel(); opening = false; loadingNew = false
         saveProgress()
         clearQueue()
@@ -1190,6 +1206,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun close() {
         saveProgress(); recordSkip()
         clearQueue()
+        if (castName != null) cast.stop()   // প্লেয়ার বন্ধ করলে টিভির কাস্ট সেশনও শেষ (নইলে নিয়ন্ত্রণহীন চলতে থাকত)
         player.stop(); player.clearMediaItems()
         PlayerHolder.clearNowPlaying()
         current = null; local = null; expanded = false
@@ -1235,8 +1252,28 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val all = dao.interests()
         topInterests = Recommender.top(all, 12)
         contextInterests = Recommender.topForBucket(all, 8)
+        profile = Recommender.summary(all)
+        boredNow = Recommender.boredKeys(history.value).sorted()
     }
-    fun resetProfile() = viewModelScope.launch { dao.clearInterests(); topInterests = emptyList(); toast(L.t("প্রোফাইল রিসেট হয়েছে")) }
+
+    /** ড্যাশবোর্ড: একটি আগ্রহ (ও তার সময়-বাকেটের কপি) পুরো মুছে ফেলা */
+    fun forgetInterest(topic: String) = viewModelScope.launch {
+        val keys = Recommender.relatedKeys(dao.interests(), topic)
+        if (keys.isNotEmpty()) dao.deleteInterests(keys)
+        loadInterests()
+        toast(L.t("ভুলে গেছে"))
+    }
+
+    /** ড্যাশবোর্ড: একটি আগ্রহের প্রভাব কমানো (স্কোর ৩০%-এ নামে) */
+    fun dampInterest(topic: String) = viewModelScope.launch {
+        val all = dao.interests()
+        val keys = Recommender.relatedKeys(all, topic).toSet()
+        val now = System.currentTimeMillis()
+        dao.upsertInterests(all.filter { it.topic in keys }.map { Recommender.dampen(it, 0.3, now) })
+        loadInterests()
+        toast(L.t("প্রভাব কমানো হয়েছে"))
+    }
+    fun resetProfile() = viewModelScope.launch { dao.clearInterests(); topInterests = emptyList(); loadInterests(); toast(L.t("প্রোফাইল রিসেট হয়েছে")) }
     fun clearHistory() = viewModelScope.launch { dao.clearHistory(); toast(L.t("ইতিহাস মুছে গেছে")) }
 
     // ---------- শুধু রিকমেন্ডেশন প্রোফাইল এক্সপোর্ট / ইম্পোর্ট ----------
@@ -1312,7 +1349,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun removeFromPlaylist(itemId: Long) = viewModelScope.launch { dao.removePlaylistItem(itemId) }
 
     // ---------- SponsorBlock / RYD ----------
-    private fun loadSegments(videoId: String) = viewModelScope.launch { segments = Extras.sponsorSegments(videoId) }
+    private fun loadSegments(videoId: String) = viewModelScope.launch { segments = Extras.sponsorSegments(videoId, sponsorCats) }
     private fun loadRyd(videoId: String) = viewModelScope.launch {
         Extras.ryd(videoId)?.let { likes = it.first; dislikes = it.second }
     }
@@ -1321,6 +1358,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun toggleSponsor(v: Boolean) {
         sponsorOn = v; prefs.sponsorBlock = v
         if (!v) segments = emptyList() else current?.let { loadSegments(it.id) }
+    }
+    /** একটি SponsorBlock ক্যাটাগরি চালু/বন্ধ; চলতি ভিডিওর সেগমেন্ট নতুন করে আনা হয় */
+    fun toggleSponsorCategory(cat: String, on: Boolean) = applySponsorCats(SponsorCategories.toggle(sponsorCats, cat, on))
+    fun applySponsorCats(cats: List<String>) {
+        if (cats == sponsorCats) return
+        sponsorCats = cats; prefs.sponsorCats = SponsorCategories.toCsv(cats)
+        if (sponsorOn) current?.let { loadSegments(it.id) }
     }
     fun togglePoToken(v: Boolean) {
         poTokenOn = v; prefs.poToken = v
@@ -1340,18 +1384,22 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun loadMoreReplies(c: CommentItem) = commentsCtl.loadMoreReplies(c)
 
     // ---------- চ্যানেল ও সাবস্ক্রিপশন ----------
+    private var channelJob: Job? = null
+
     fun openChannel(url: String?) {
         if (url == null) return
         expanded = false; channelOpen = true; channel = null
         channelPls.reset()
-        viewModelScope.launch {
+        channelJob?.cancel()   // দ্রুত দুটো চ্যানেলে ট্যাপ করলে আগেরটার ফলাফল পরেরটার ওপর বসবে না
+        channelJob = viewModelScope.launch {
             channelLoading = true
-try {
+            try {
                 val ch = YtRepository.channel(url)
                 channel = ch
                 subs.value.firstOrNull { it.url == url || it.url == ch.url }?.let { s ->
                     if (s.avatar == null && ch.avatar != null) dao.addSub(s.copy(avatar = ch.avatar))
                 }
+            } catch (e: CancellationException) { throw e
             } catch (e: Exception) { error = e.message }
             channelLoading = false
         }

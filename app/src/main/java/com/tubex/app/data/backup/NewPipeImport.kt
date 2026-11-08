@@ -56,7 +56,10 @@ object NewPipeImport {
                 }
             }
             val uniq = hist.distinctBy { it.url }        // নতুনটাই আগে থাকে
-            uniq.forEach { dao.upsertHistory(it) }
+            uniq.forEach { h ->   // ফোনে আরও নতুন এন্ট্রি (পজিশনসহ) থাকলে পুরনোটা তার ওপর বসাই না
+                val local = dao.historyOf(h.url)
+                if (local == null || local.watchedAt < h.watchedAt) dao.upsertHistory(h)
+            }
             histN = uniq.size
             Recommender.seed(dao, uniq.take(300).map { it.title to it.channel }, 0.5)   // রিকমেন্ডেশন প্রোফাইলের বীজ
         } finally {

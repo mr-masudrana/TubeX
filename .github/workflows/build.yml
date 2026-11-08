@@ -25,6 +25,9 @@ jobs:
         with:
           gradle-version: "8.9"
 
+      - name: Strings যাচাই (অনুবাদ রিসোর্স ও StringIds.kt সিঙ্কে আছে কি না)
+        run: python3 tools/gen_string_ids.py --check
+
       - name: Unit tests
         run: gradle testDebugUnitTest --stacktrace
 
