@@ -63,9 +63,21 @@ object L {
         }
     }
 
+    /** ইংরেজি অঙ্ককে বাংলা অঙ্কে রূপান্তর (0→০ … 9→৯); অন্য অক্ষর যেমন আছে তেমনই থাকে */
+    private fun toBanglaDigits(s: String): String =
+        buildString(s.length) { for (c in s) append(if (c in '0'..'9') '\u09E6' + (c - '0') else c) }
+
+    /**
+     * `{0}`, `{1}` … প্লেসহোল্ডার বসায়। বাংলা মোডে সংখ্যা ([Number]) আর্গুমেন্ট বাংলা অঙ্কে দেখায়;
+     * স্ট্রিং আর্গুমেন্ট (চ্যানেলের নাম ইত্যাদি) অপরিবর্তিত থাকে।
+     */
     fun f(bn: String, vararg args: Any?): String {
         var s = t(bn)
-        for (i in args.indices) s = s.replace("{$i}", args[i].toString())
+        for (i in args.indices) {
+            val a = args[i]
+            val v = a.toString()
+            s = s.replace("{$i}", if (lang == "bn" && a is Number) toBanglaDigits(v) else v)
+        }
         return s
     }
 }
