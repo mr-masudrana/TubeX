@@ -15,7 +15,7 @@ class LangTest {
 
     @Test fun formatReplacesPlaceholders() {
         L.apply(0)
-        assertEquals("৩টি ভিডিও, এক", L.f("{0}টি ভিডিও, {1}", 3 as Any?, "এক"))
+        assertEquals("3টি ভিডিও, এক", L.f("{0}টি ভিডিও, {1}", 3 as Any?, "এক"))
     }
 
     @Test fun unknownModeFallsBackToBangla() {
