@@ -2,6 +2,8 @@ package com.tubex.app.ui.home
 
 import com.tubex.app.data.model.VideoItem
 import com.tubex.app.data.search.ChannelSearch
+import com.tubex.app.data.search.HomePlaylists
+import com.tubex.app.data.search.HomeRow
 import com.tubex.app.data.search.SearchFilter
 import com.tubex.app.util.L
 import com.tubex.app.ui.components.VideoCard
@@ -287,6 +289,10 @@ private fun HomeFeed(
             total > 0 && last >= total - 4
         }
     }
+    // প্লেলিস্ট সেকশন (প্রথম ৪টি ভিডিওর পর) + ভিডিওর ফাঁকে ফাঁকে একক প্লেলিস্ট কার্ড (৮ম ভিডিওর পর, তারপর প্রতি ৫টির পর)
+    val rows = remember(shown, vm.homePlaylists, showShelf) {
+        if (showShelf) HomePlaylists.layout(shown, vm.homePlaylists) else shown.map { HomeRow.Video(it) }
+    }
     LaunchedEffect(showShelf) { if (showShelf) vm.loadHomePlaylists() }
     LaunchedEffect(nearEnd, shown.size) {
         if (nearEnd && showShelf) vm.loadMoreForYou()
@@ -327,12 +333,18 @@ private fun HomeFeed(
                     }
                     item { HorizontalDivider(color = Chip) }
                 }
-                // প্লেলিস্ট সারি প্রথম ৪টি ভিডিওর পরে (অফিসিয়াল YouTube-এর মতো মাঝখানে)
-                val plShelf = showShelf && vm.homePlaylists.isNotEmpty()
-                val head = if (plShelf) minOf(4, shown.size) else shown.size
-                items(shown.take(head)) { v -> VideoCard(v, onChannel = { vm.openChannel(v.channelUrl) }) { vm.play(v.url) } }
-                if (plShelf) item { HomePlaylistsShelf(vm.homePlaylists) { vm.openPlaylist(it) } }
-                if (plShelf) items(shown.drop(head)) { v -> VideoCard(v, onChannel = { vm.openChannel(v.channelUrl) }) { vm.play(v.url) } }
+                items(rows) { r ->
+                    when (r) {
+                        is HomeRow.Video -> VideoCard(r.v, onChannel = { vm.openChannel(r.v.channelUrl) }) { vm.play(r.v.url) }
+                        is HomeRow.Shelf -> HomePlaylistsShelf(r.items) { vm.openPlaylist(it) }
+                        is HomeRow.Playlist -> HomePlaylistCard(
+                            r.p,
+                            onPlay = { vm.playPlaylistUrl(r.p.url) },
+                            onOpen = { vm.openPlaylist(r.p.url) },
+                            onShuffle = { vm.playPlaylistUrl(r.p.url, true) }
+                        )
+                    }
+                }
                 if (vm.loadingMore) item {
                     Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(color = YtRed, strokeWidth = 2.dp, modifier = Modifier.size(24.dp))

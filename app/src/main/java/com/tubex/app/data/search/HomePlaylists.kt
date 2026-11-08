@@ -1,6 +1,15 @@
 package com.tubex.app.data.search
 
 import com.tubex.app.data.model.PlaylistEntry
+import com.tubex.app.data.model.VideoItem
+
+/** হোম ফিডের একটি সারি: ভিডিও, অথবা একক প্লেলিস্ট কার্ড */
+sealed class HomeRow {
+    data class Video(val v: VideoItem) : HomeRow()
+    data class Playlist(val p: PlaylistEntry) : HomeRow()
+    /** "আপনার জন্য প্লেলিস্ট" আনুভূমিক সারি (সেকশন) */
+    data class Shelf(val items: List<PlaylistEntry>) : HomeRow()
+}
 
 /**
  * হোমের "প্লেলিস্ট" সারির যুক্তি (নেটওয়ার্ক ছাড়া, ইউনিট টেস্টযোগ্য):
@@ -25,6 +34,44 @@ object HomePlaylists {
             if (out.size >= max) break
         }
         return if (out.isEmpty()) FALLBACK_QUERIES.take(2) else out
+    }
+
+    /**
+     * ভিডিওর ফাঁকে একটি করে প্লেলিস্ট: প্রথম [first]টি ভিডিওর পর, তারপর প্রতি [every]টি ভিডিওর পর।
+     * প্লেলিস্ট ফুরালে আর বসে না; ভিডিও কম থাকলে সব প্লেলিস্ট বসে না (শেষে ঝুলে থাকে না)।
+     */
+    fun interleave(videos: List<VideoItem>, playlists: List<PlaylistEntry>, first: Int = 4, every: Int = 5): List<HomeRow> {
+        val out = ArrayList<HomeRow>(videos.size + playlists.size)
+        var next = 0
+        var gap = first
+        for (v in videos) {
+            out += HomeRow.Video(v)
+            if (--gap == 0 && next < playlists.size) { out += HomeRow.Playlist(playlists[next++]); gap = every }
+            else if (gap == 0) gap = every
+        }
+        return out
+    }
+
+    /**
+     * হোমের পুরো বিন্যাস: প্রথম [shelfAfter]টি ভিডিওর পর "প্লেলিস্ট সেকশন" ([shelfSize]টি), আর বাকি প্লেলিস্ট
+     * থেকে একক কার্ড ভিডিওর ফাঁকে ([firstSingle]-তম ভিডিওর পর, তারপর প্রতি [every]টির পর)।
+     * সেকশন ও একক কার্ডে একই প্লেলিস্ট দুইবার আসে না।
+     */
+    fun layout(
+        videos: List<VideoItem>, playlists: List<PlaylistEntry>,
+        shelfSize: Int = 6, shelfAfter: Int = 4, firstSingle: Int = 8, every: Int = 5
+    ): List<HomeRow> {
+        val shelf = playlists.take(shelfSize)
+        val rows = interleave(videos, playlists.drop(shelfSize), firstSingle, every)
+        if (shelf.isEmpty()) return rows
+        val out = ArrayList<HomeRow>(rows.size + 1)
+        var seen = 0; var placed = false
+        for (r in rows) {
+            out += r
+            if (!placed && r is HomeRow.Video && ++seen == shelfAfter) { out += HomeRow.Shelf(shelf); placed = true }
+        }
+        if (!placed) out += HomeRow.Shelf(shelf)   // ভিডিও কম থাকলেও সেকশন দেখায় (আগের মতো)
+        return out
     }
 
     /** প্রতিটি সার্চ থেকে পালাক্রমে নিয়ে মেশায় (এক বিষয়ের আধিপত্য এড়াতে); একই URL একবার; ভিডিও-সংখ্যা ০ হলে বাদ */

@@ -420,4 +420,10 @@ internal val BN_STRING_IDS: Map<String, Int> = mapOf(
     "যেসব অংশ বাদ যাবে" to R.string.segments_to_skip,
     "ফিলার চালু করলে আসল কথাও কেটে যেতে পারে" to R.string.filler_warning,
     "সিস্টেমের সময়সীমা শেষ — ডাউনলোড থামানো হয়েছে। অ্যাপ খুলে আবার চালু করুন।" to R.string.download_timeout_paused,
+    "এই ভিডিওর চ্যানেল" to R.string.channels_in_this_video,
+    "এলোমেলো চালান" to R.string.shuffle_play,
+    "প্লেলিস্ট পেজ" to R.string.playlist_page,
+    "কিউ থেকে সরান" to R.string.remove_from_queue,
+    "সাবস্ক্রাইব করা চ্যানেলের জনপ্রিয় ভিডিও" to R.string.popular_video_from_subscribed_channel,
+    "এখন ট্রেন্ডিং" to R.string.trending_now,
 )

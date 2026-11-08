@@ -44,12 +44,14 @@ import org.schabi.newpipe.extractor.comments.CommentsInfo
 import org.schabi.newpipe.extractor.search.SearchInfo
 import org.schabi.newpipe.extractor.stream.StreamInfo
 import org.schabi.newpipe.extractor.stream.StreamInfoItem
+import org.schabi.newpipe.extractor.stream.StreamType
 
 private fun StreamInfoItem.toVideo() = VideoItem(
     title = name, url = url, channel = uploaderName ?: "", channelUrl = uploaderUrl,
     views = viewCount, durationSec = duration,
     thumb = thumbnails.lastOrNull()?.url, uploaded = textualUploadDate,
-    channelAvatar = uploaderAvatars.lastOrNull()?.url
+    channelAvatar = uploaderAvatars.lastOrNull()?.url,
+    isLive = streamType == StreamType.LIVE_STREAM || streamType == StreamType.AUDIO_LIVE_STREAM
 )
 
 object YtRepository {
@@ -83,6 +85,10 @@ object YtRepository {
         val handler = yt.searchQHFactory.fromQuery(query, listOf("playlists"), "")
         SearchInfo.getInfo(yt, handler).relatedItems.filterIsInstance<PlaylistInfoItem>().take(limit).map { it.toEntry() }
     }
+
+    /** ভিডিওটি এখন লাইভ স্ট্রিম কি না */
+    fun isLive(info: StreamInfo): Boolean =
+        info.streamType == StreamType.LIVE_STREAM || info.streamType == StreamType.AUDIO_LIVE_STREAM
 
     suspend fun streamInfo(url: String): StreamInfo = withContext(Dispatchers.IO) { Retry.withBackoff { StreamInfo.getInfo(yt, url) } }
 
@@ -299,7 +305,9 @@ object YtRepository {
         val http = http()
         val progressive = ProgressiveMediaSource.Factory(http)
 
-        if (info.hlsUrl.isNotBlank() && info.videoOnlyStreams.isEmpty() && info.videoStreams.isEmpty()) {
+        // লাইভ হলে সবসময় HLS (লাইভ এজ থেকে চলে); নইলে আগের মতো — অন্য স্ট্রিম না থাকলে HLS
+        if (info.hlsUrl.isNotBlank() &&
+            (isLive(info) || (info.videoOnlyStreams.isEmpty() && info.videoStreams.isEmpty()))) {
             return HlsMediaSource.Factory(http).createMediaSource(item(info.hlsUrl, meta))
         }
         val mp4 = info.videoOnlyStreams.filter { it.format == MediaFormat.MPEG_4 && it.height <= maxHeight }

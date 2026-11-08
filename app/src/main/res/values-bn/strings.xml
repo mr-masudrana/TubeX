@@ -418,4 +418,10 @@
     <string name="segments_to_skip" formatted="false">যেসব অংশ বাদ যাবে</string>
     <string name="filler_warning" formatted="false">ফিলার চালু করলে আসল কথাও কেটে যেতে পারে</string>
     <string name="download_timeout_paused" formatted="false">সিস্টেমের সময়সীমা শেষ — ডাউনলোড থামানো হয়েছে। অ্যাপ খুলে আবার চালু করুন।</string>
+    <string name="channels_in_this_video" formatted="false">এই ভিডিওর চ্যানেল</string>
+    <string name="shuffle_play" formatted="false">এলোমেলো চালান</string>
+    <string name="playlist_page" formatted="false">প্লেলিস্ট পেজ</string>
+    <string name="remove_from_queue" formatted="false">কিউ থেকে সরান</string>
+    <string name="popular_video_from_subscribed_channel" formatted="false">সাবস্ক্রাইব করা চ্যানেলের জনপ্রিয় ভিডিও</string>
+    <string name="trending_now" formatted="false">এখন ট্রেন্ডিং</string>
 </resources>

@@ -26,7 +26,8 @@ object SubsCache {
                     views = v.optLong("views", -1), durationSec = v.optLong("durationSec"),
                     thumb = v.optString("thumb").takeIf { it.isNotEmpty() },
                     uploaded = v.optString("uploaded").takeIf { it.isNotEmpty() },
-                    channelAvatar = v.optString("channelAvatar").takeIf { it.isNotEmpty() }
+                    channelAvatar = v.optString("channelAvatar").takeIf { it.isNotEmpty() },
+                    isLive = v.optBoolean("isLive", false)
                 )
             })
         }
@@ -40,6 +41,7 @@ object SubsCache {
                     JSONObject().put("title", it.title).put("url", it.url).put("channel", it.channel)
                         .put("channelUrl", it.channelUrl).put("views", it.views).put("durationSec", it.durationSec)
                         .put("thumb", it.thumb).put("uploaded", it.uploaded).put("channelAvatar", it.channelAvatar)
+                        .put("isLive", it.isLive)
                 )
             }
             file(ctx).writeText(JSONObject().put("time", System.currentTimeMillis()).put("key", key).put("items", a).toString())

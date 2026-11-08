@@ -15,8 +15,13 @@ data class VideoItem(
     val reason: String? = null,
     val channelAvatar: String? = null,
     /** "কেন সাজেস্ট হলো?" — সবচেয়ে জোরালো ১–৩টি কারণ (শুধু ফিডের র‍্যাংকিং ভরে) */
-    val why: List<String> = emptyList()
+    val why: List<String> = emptyList(),
+    /** এখন লাইভ চলছে (শিডিউল/প্রিমিয়ার নয়): কার্ডে চ্যানেল লোগোতে লাল বর্ডার */
+    val isLive: Boolean = false
 )
+
+/** কোলাব ভিডিওর একটি চ্যানেল (কার্ডে ছোট লোগো, মডালে তালিকা) */
+data class ChannelRef(val name: String, val url: String, val avatar: String?)
 
 data class ChannelData(
     val url: String, val name: String, val avatar: String?, val banner: String?,

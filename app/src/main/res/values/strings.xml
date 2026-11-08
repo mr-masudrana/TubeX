@@ -418,4 +418,10 @@
     <string name="segments_to_skip" formatted="false">Segments to skip</string>
     <string name="filler_warning" formatted="false">Turning on filler may also cut real content</string>
     <string name="download_timeout_paused" formatted="false">System time limit reached — downloads paused. Open the app and resume them.</string>
+    <string name="channels_in_this_video" formatted="false">Channels in this video</string>
+    <string name="shuffle_play" formatted="false">Shuffle play</string>
+    <string name="playlist_page" formatted="false">Playlist page</string>
+    <string name="remove_from_queue" formatted="false">Remove from queue</string>
+    <string name="popular_video_from_subscribed_channel" formatted="false">Popular video from a channel you subscribe to</string>
+    <string name="trending_now" formatted="false">Trending now</string>
 </resources>

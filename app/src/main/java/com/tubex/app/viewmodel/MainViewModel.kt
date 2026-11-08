@@ -26,6 +26,7 @@ import com.tubex.app.data.recommend.Recommender
 import com.tubex.app.data.remote.DeArrow
 import com.tubex.app.data.search.ChannelSearch
 import com.tubex.app.data.search.HomePlaylists
+import com.tubex.app.data.recommend.HomeMix
 import com.tubex.app.data.search.PrefetchPlan
 import com.tubex.app.data.search.PlaylistLinks
 import com.tubex.app.data.remote.Extras
@@ -468,8 +469,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val hist = history.value.ifEmpty { dao.history().first() }
         val subsNow = subs.value.ifEmpty { dao.subsOnce() }
         val relSrc = (listOfNotNull(hist.firstOrNull()?.url) + hist.drop(1).take(9).shuffled().take(1).map { it.url }).distinct()
-        // সাবস্ক্রাইব করা চ্যানেলের তাজা ভিডিও (প্রতিবার ৩টি র‍্যান্ডম চ্যানেল)
-        val subSrc = subsNow.shuffled().take(3)
+        // সাবস্ক্রাইব করা চ্যানেলের নতুন ও জনপ্রিয় ভিডিও (প্রতিবার ৪টি র‍্যান্ডম চ্যানেল)
+        val subSrc = subsNow.shuffled().take(4)
         val (pools, relatedPool) = coroutineScope {
             val rel = relSrc.map { u ->
                 async { runCatching { YtRepository.related(YtRepository.streamInfo(u)) }.getOrDefault(emptyList()) }
@@ -478,7 +479,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 async {
                     kotlinx.coroutines.withTimeoutOrNull(8_000) {
                         runCatching { YtRepository.channelVideos(sc.url) }.getOrDefault(emptyList())
-                    }.orEmpty().take(8)
+                    }.orEmpty()
                 }
             }
             val jobs = listOf(async { runCatching { YtRepository.trending() }.getOrDefault(emptyList()) }) +
@@ -486,8 +487,16 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                     subJobs
             jobs.awaitAll() to rel.awaitAll().flatten()
         }
-        val merged = (pools.flatten() + relatedPool).distinctBy { it.url }.filter { it.url !in exclude }
-        val ranked = filterBlocked(
+        // pools = [ট্রেন্ডিং] + [সার্চ…] + [প্রতিটি সাবস্ক্রাইব করা চ্যানেলের সাম্প্রতিক ভিডিও…]
+        val trendingList = pools.first()
+        val subLists = pools.takeLast(subSrc.size)
+        val searchLists = pools.drop(1).dropLast(subSrc.size)
+        val picks = subLists.map { HomeMix.channelPicks(it) }
+        val subNewSet = picks.flatMap { it.new }.mapTo(HashSet()) { it.url }
+        val subPopSet = picks.flatMap { it.popular }.mapTo(HashSet()) { it.url }
+        val merged = (trendingList + searchLists.flatten() + subLists.flatMap { it.take(8) } + picks.flatMap { it.popular } + relatedPool)
+            .distinctBy { it.url }.filter { it.url !in exclude }
+        val ranked0 = filterBlocked(
             Recommender.rank(
                 merged, interests, dao.watchedUrls().toSet(), hist,
                 subsNow.map { it.name.lowercase() }.toSet(),
@@ -495,6 +504,15 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 shown = shownCounts
             )
         )
+        // ট্রেন্ডিং + সাবস্ক্রাইব করা চ্যানেলের নতুন/জনপ্রিয় ভিডিও ফিডে নিশ্চিত রাখা (র‍্যাংকিংয়ে নিচে পড়লেও)
+        val ranked = HomeMix.compose(ranked0, trendingList.mapTo(HashSet()) { it.url }, subNewSet, subPopSet) { v, k ->
+            val label = when (k) {
+                HomeMix.Kind.SUB_NEW -> L.t("সাবস্ক্রাইব করা চ্যানেলের নতুন ভিডিও")
+                HomeMix.Kind.SUB_POPULAR -> L.t("সাবস্ক্রাইব করা চ্যানেলের জনপ্রিয় ভিডিও")
+                HomeMix.Kind.TRENDING -> L.t("এখন ট্রেন্ডিং")
+            }
+            v.copy(reason = label, why = (listOf(label) + v.why).distinct().take(3))
+        }
         // কম লাইক-অনুপাতের ভিডিও শেষে পাঠানো (সর্বোচ্চ ৪ সেকেন্ড অপেক্ষা; না পেলে যেমন আছে তেমন)
         val r = if (prefs.ryd) kotlinx.coroutines.withTimeoutOrNull(4_000) { demoteLowEngagement(ranked) } ?: ranked
         else ranked
@@ -731,9 +749,15 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     /** কার্ডের মেনু থেকে: পরে চালান (playNext) বা কিউর শেষে যোগ */
     fun addToQueue(v: VideoItem, playNext: Boolean) {
-        val item = QItem(v.url, v.title, v.channel, v.thumb)
+        val item = v.toQ()
         if (!active) { playQueueItems(listOf(item), 0); return }
-        val seed = current?.let { QItem(it.url, it.name, it.uploaderName ?: "", it.thumbnails.lastOrNull()?.url) }
+        val seed = current?.let {
+            QItem(
+                it.url, it.name, it.uploaderName ?: "", it.thumbnails.lastOrNull()?.url,
+                durationSec = it.duration, views = it.viewCount, uploaded = it.textualUploadDate,
+                live = YtRepository.isLive(it)
+            )
+        }
         queue.add(item, playNext, seed)
         toast(L.t("কিউতে যোগ হয়েছে"))
     }
@@ -833,7 +857,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 val info = infoFor(url)
                 sessionPlayed.add(info.url)
                 val h = dao.historyOf(info.url)
-                val start = if (h != null && h.positionMs > 5_000 &&
+                val start = if (!YtRepository.isLive(info) && h != null && h.positionMs > 5_000 &&
                     (info.duration <= 0 || h.positionMs < info.duration * 1000 - 15_000)) h.positionMs else 0L
 
                 val hs = YtRepository.heights(info)
@@ -1414,7 +1438,35 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun loadMorePlaylist() = playlistCtl.loadMore()
     fun saveOnlinePlaylist() = playlistCtl.saveToLibrary()
 
-    private fun VideoItem.toQ() = QItem(url, title, channel, thumb)
+    private fun VideoItem.toQ() = QItem(url, title, channel, thumb, durationSec, views, uploaded, isLive)
+
+    private var playlistPlayJob: Job? = null
+
+    /** হোমের প্লেলিস্ট কার্ড: প্লেলিস্ট পেজ না খুলে সরাসরি চালায় (প্রথম ভিডিও/শাফলে); বাকি পেজ পেছনে এনে কিউ বাড়ায় */
+    fun playPlaylistUrl(url: String, shuffleStart: Boolean = false) {
+        playlistPlayJob?.cancel()
+        playlistPlayJob = viewModelScope.launch {
+            toast(L.t("লোড হচ্ছে…"))
+            try {
+                val pl = YtRepository.playlist(url)
+                if (pl.videos.isEmpty()) { toast(L.t("প্লেলিস্ট লোড করা যায়নি")); return@launch }
+                playQueueItems(pl.videos.map { it.toQ() }, 0, shuffleStart, pl.name.ifBlank { null })
+                val queued = queue.items
+                var cur = pl; var guard = 0
+                while (cur.next != null && cur.videos.size < 500 && guard++ < 30) {
+                    val (list, nx) = try { YtRepository.playlistMore(cur.url, cur.next!!) }
+                    catch (e: CancellationException) { throw e }
+                    catch (e: Exception) { Pair(emptyList<VideoItem>(), null) }
+                    cur = cur.copy(videos = cur.videos + list, next = nx)
+                }
+                if (queue.items === queued && cur.videos.size > queued.size) queue.replaceItems(cur.videos.map { it.toQ() })
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                toast(L.t("প্লেলিস্ট লোড করা যায়নি"))
+            }
+        }
+    }
 
     /** index নম্বর থেকে (বা শাফল করে) প্লেলিস্ট চালায়; বাকি পেজগুলো পেছনে লোড হয়ে কিউতে যোগ হয় */
     fun playPlaylistFrom(index: Int, shuffleStart: Boolean = false) {

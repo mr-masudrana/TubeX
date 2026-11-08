@@ -1,6 +1,8 @@
 package com.tubex.app.player.ui
 
 import com.tubex.app.util.L
+import com.tubex.app.util.fmtCount
+import com.tubex.app.util.fmtDur
 import com.tubex.app.ui.theme.Bg
 import com.tubex.app.ui.theme.Chip
 import com.tubex.app.ui.theme.Sub
@@ -27,6 +29,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -265,31 +268,58 @@ internal fun QueueSheet(vm: MainViewModel, onDismiss: () -> Unit) {
     var dragKey by remember { mutableStateOf<String?>(null) }
     var dragDelta by remember { mutableFloatStateOf(0f) }
     var expectedIndex by remember { mutableIntStateOf(-1) }   // সোয়াপের পর লেআউট হালনাগাদ হওয়া পর্যন্ত অপেক্ষা
+    var headMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { if (vm.queueCurrent > 0) listState.scrollToItem(vm.queueCurrent - 1) }
     LaunchedEffect(undo) { if (undo != null) { delay(5000); undo = null } }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Chip) {
-        Text(
-            vm.queueTitle?.let { L.f("প্লেলিস্ট: {0}", it) } ?: L.t("কিউ"),
-            fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 0.dp)
-        )
-        if (items.isNotEmpty()) Text(
-            L.f("{0}টি ভিডিও", items.size) + if (items.size > 1) " · " + L.t("⠿ ধরে টেনে সাজান, পাশে সোয়াইপ করে সরান") else "",
-            color = Sub, fontSize = 12.sp, modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 4.dp)
-        )
-        OptionRow(L.t("রিপিট"), listOf(0, 1, 2), vm.repeat, { listOf(L.t("বন্ধ"), L.t("কিউ"), L.t("একটি ভিডিও"))[it] }) { vm.chooseRepeat(it) }
-        ToggleRow(L.t("শাফল"), L.t("কিউ থেকে এলোমেলো ভিডিও চলবে"), vm.shuffle) { vm.toggleShuffle(it) }
+    // অফিসিয়াল YouTube-এর প্লেলিস্ট/মিক্স প্যানেলের মতো: শিরোনাম + ✕, রিপিট/শাফল/⋮, বাঁ দিকে হ্যান্ডেল, বড় থাম্বনেইল
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Bg) {
+        Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (vm.queueTitle != null) {
+                        Icon(Icons.AutoMirrored.Filled.PlaylistPlay, null, modifier = Modifier.size(26.dp))
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    Text(
+                        vm.queueTitle ?: L.t("কিউ"),
+                        fontWeight = FontWeight.Bold, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis
+                    )
+                }
+                if (items.isNotEmpty()) Text(L.f("{0}টি ভিডিও", items.size), color = Sub, fontSize = 14.sp)
+            }
+            IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, L.t("বন্ধ করুন")) }
+        }
+        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { vm.chooseRepeat((vm.repeat + 1) % 3) }) {
+                Icon(
+                    if (vm.repeat == 2) Icons.Filled.RepeatOne else Icons.Filled.Repeat, L.t("রিপিট"),
+                    tint = if (vm.repeat != 0) YtRed else LocalContentColor.current
+                )
+            }
+            IconButton(onClick = { vm.toggleShuffle(!vm.shuffle) }) {
+                Icon(Icons.Filled.Shuffle, L.t("শাফল"), tint = if (vm.shuffle) YtRed else LocalContentColor.current)
+            }
+            Spacer(Modifier.weight(1f))
+            if (items.isNotEmpty()) Box {
+                IconButton(onClick = { headMenu = true }) { Icon(Icons.Filled.MoreVert, null) }
+                DropdownMenu(headMenu, { headMenu = false }) {
+                    DropdownMenuItem(text = { Text(L.t("কিউ খালি করুন")) }, onClick = { headMenu = false; vm.queueClear(); undo = null })
+                }
+            }
+        }
         if (items.isEmpty()) Text(
             L.t("কিউ খালি। ভিডিও কার্ডের ⋮ মেনু থেকে পরে চালান বা কিউতে যোগ করুন।"),
             color = Sub, fontSize = 13.sp, modifier = Modifier.padding(16.dp)
         )
-        LazyColumn(state = listState, modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
+        LazyColumn(state = listState, modifier = Modifier.fillMaxWidth().heightIn(max = 520.dp)) {
             itemsIndexed(items, key = { i, _ -> keys[i] }) { i, q ->
                 val key = keys[i]
                 val dragging = dragKey == key
+                val current = i == vm.queueCurrent
                 val pos = rememberUpdatedState(i)
+                var rowMenu by remember(key) { mutableStateOf(false) }
                 val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = { v ->
                     if (v == SwipeToDismissBoxValue.Settled) false
                     else { vm.queueRemove(pos.value)?.let { undo = it }; true }
@@ -308,29 +338,15 @@ internal fun QueueSheet(vm: MainViewModel, onDismiss: () -> Unit) {
                     }
                 ) {
                     Row(
-                        Modifier.fillMaxWidth().background(Chip)
-                            .background(if (i == vm.queueCurrent) YtRed.copy(alpha = 0.15f) else Color.Transparent)
-                            .clickable { vm.queuePlayAt(i) }.padding(start = 12.dp, top = 6.dp, bottom = 6.dp),
+                        Modifier.fillMaxWidth().background(Bg)
+                            .background(if (current) Sub.copy(alpha = 0.16f) else Color.Transparent)
+                            .clickable { vm.queuePlayAt(i) }.padding(start = 4.dp, top = 8.dp, bottom = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
-                            if (i == vm.queueCurrent) Icon(Icons.Filled.PlayArrow, null, tint = YtRed, modifier = Modifier.size(18.dp))
-                            else Text("${i + 1}", color = Sub, fontSize = 12.sp)
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        AsyncImage(
-                            model = q.thumb, contentDescription = null, contentScale = ContentScale.Crop,
-                            modifier = Modifier.width(80.dp).aspectRatio(16f / 9f).clip(RoundedCornerShape(6.dp)).background(Bg)
-                        )
-                        Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
-                            Text(q.title, fontSize = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
-                                fontWeight = if (i == vm.queueCurrent) FontWeight.SemiBold else FontWeight.Normal)
-                            Text(q.channel, color = Sub, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
-                        // ড্র্যাগ হ্যান্ডেল: চেপে ধরে টানলে ক্রম বদলায়
+                        // ড্র্যাগ হ্যান্ডেল (বাঁয়ে): চেপে ধরে টানলে ক্রম বদলায়
                         Icon(
                             Icons.Filled.DragHandle, contentDescription = L.t("টেনে সাজান"), tint = Sub,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp).size(28.dp)
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 8.dp).size(26.dp)
                                 .pointerInput(key) {
                                     detectDragGesturesAfterLongPress(
                                         onDragStart = { dragKey = key; dragDelta = 0f; expectedIndex = -1 },
@@ -358,6 +374,41 @@ internal fun QueueSheet(vm: MainViewModel, onDismiss: () -> Unit) {
                                     )
                                 }
                         )
+                        Box(Modifier.width(140.dp)) {
+                            AsyncImage(
+                                model = q.thumb, contentDescription = null, contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(8.dp)).background(Chip)
+                            )
+                            if (q.live || q.durationSec > 0) Text(
+                                if (q.live) "LIVE" else fmtDur(q.durationSec), color = Color.White, fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp)
+                                    .background(if (q.live) YtRed else Color(0xCC000000), RoundedCornerShape(4.dp))
+                                    .padding(horizontal = 4.dp, vertical = 1.dp)
+                            )
+                        }
+                        Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
+                            Text(q.title, fontSize = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 19.sp,
+                                fontWeight = if (current) FontWeight.SemiBold else FontWeight.Normal)
+                            if (q.channel.isNotBlank()) Text(q.channel, color = Sub, fontSize = 12.sp, maxLines = 1,
+                                overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
+                            val meta = listOfNotNull(
+                                fmtCount(q.views).ifBlank { null }?.let { L.f("{0} ভিউ", it) },
+                                q.uploaded?.takeIf { it.isNotBlank() }
+                            ).joinToString(" • ")
+                            if (meta.isNotEmpty()) Text(meta, color = Sub, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                        Box {
+                            IconButton(onClick = { rowMenu = true }, modifier = Modifier.size(36.dp)) {
+                                Icon(Icons.Filled.MoreVert, null, modifier = Modifier.size(20.dp))
+                            }
+                            DropdownMenu(rowMenu, { rowMenu = false }) {
+                                DropdownMenuItem(
+                                    text = { Text(L.t("কিউ থেকে সরান")) },
+                                    onClick = { rowMenu = false; vm.queueRemove(pos.value)?.let { undo = it } }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -365,16 +416,13 @@ internal fun QueueSheet(vm: MainViewModel, onDismiss: () -> Unit) {
         undo?.let { r ->
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
-                    .clip(RoundedCornerShape(8.dp)).background(Bg).padding(start = 12.dp),
+                    .clip(RoundedCornerShape(8.dp)).background(Chip).padding(start = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(L.f("\u201c{0}\u201d সরানো হয়েছে", r.item.title), fontSize = 13.sp, maxLines = 1,
                     overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 TextButton(onClick = { vm.queueRestore(r); undo = null }) { Text(L.t("পূর্বাবস্থা")) }
             }
-        }
-        if (items.isNotEmpty()) TextButton(onClick = { vm.queueClear(); undo = null }, modifier = Modifier.padding(horizontal = 8.dp)) {
-            Text(L.t("কিউ খালি করুন"))
         }
         Spacer(Modifier.height(16.dp))
     }

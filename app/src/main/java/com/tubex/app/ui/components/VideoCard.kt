@@ -3,6 +3,8 @@ package com.tubex.app.ui.components
 import com.tubex.app.data.model.VideoItem
 import com.tubex.app.data.recommend.Recommender
 import com.tubex.app.data.remote.DeArrow
+import com.tubex.app.data.remote.Collab
+import com.tubex.app.data.cache.CollabCache
 import com.tubex.app.util.L
 import com.tubex.app.ui.main.LocalVm
 import com.tubex.app.ui.theme.Chip
@@ -37,6 +39,13 @@ fun VideoCard(v: VideoItem, onChannel: () -> Unit = {}, onClick: () -> Unit) {
     var menu by remember { mutableStateOf(false) }
     var showKw by remember { mutableStateOf(false) }
     var showWhy by remember { mutableStateOf(false) }
+    var showChannels by remember { mutableStateOf(false) }
+
+    // কোলাব ভিডিও (একাধিক চ্যানেল): সম্ভাব্য হলে পেজ থেকে চ্যানেল তালিকা আনে; ২+ পেলে ছোট লোগোর স্ট্যাক
+    val maybeCollab = remember(v.url, v.channel, v.channelUrl) { Collab.mayBeCollab(v.channel, v.channelUrl) }
+    if (maybeCollab) LaunchedEffect(v.url) { CollabCache.ensure(v.url) }
+    val collab = if (maybeCollab) CollabCache.map[v.url].orEmpty() else emptyList()
+    val isCollab = collab.size >= 2
 
     // DeArrow
     val vid = remember(v.url) { DeArrow.videoId(v.url) }
@@ -56,15 +65,16 @@ fun VideoCard(v: VideoItem, onChannel: () -> Unit = {}, onClick: () -> Unit) {
             Text(
                 fmtDur(v.durationSec), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium,
                 modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp)
-                    .background(if (v.durationSec <= 0) YtRed else Color(0xCC000000), RoundedCornerShape(4.dp))
+                    .background(if (v.isLive || v.durationSec <= 0) YtRed else Color(0xCC000000), RoundedCornerShape(4.dp))
                     .padding(horizontal = 4.dp, vertical = 1.dp)
             )
         }
         Row(Modifier.padding(12.dp, 12.dp, 4.dp, 0.dp)) {
             val subAvatar = vm?.subs?.collectAsState()?.value
                 ?.firstOrNull { it.url == v.channelUrl || it.name == v.channel }?.avatar
-            Box(Modifier.clickable(onClick = onChannel)) {
-                ChannelAvatar(v.channelAvatar ?: subAvatar, v.channelUrl, v.channel, 36.dp)
+            Box(Modifier.clickable(onClick = if (isCollab) { { showChannels = true } } else onChannel)) {
+                if (isCollab) ChannelAvatarStack(collab, live = v.isLive)
+                else ChannelAvatar(v.channelAvatar ?: subAvatar, v.channelUrl, v.channel, 36.dp, live = v.isLive)
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
@@ -98,6 +108,11 @@ fun VideoCard(v: VideoItem, onChannel: () -> Unit = {}, onClick: () -> Unit) {
                 }
             }
         }
+    }
+
+    if (showChannels && isCollab) ChannelListDialog(collab, onDismiss = { showChannels = false }) { url ->
+        showChannels = false
+        vm?.openChannel(url)
     }
 
     if (showWhy) AlertDialog(
