@@ -89,7 +89,7 @@ dependencies {
     // YouTube ঘন ঘন বদলায়: ভিডিও না চললে প্রথমে এই ভার্সন আপডেট করুন
     implementation("com.github.TeamNewPipe:NewPipeExtractor:v0.26.5")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("androidx.work:work-runtime-ktx:2.10.0")
+    implementation("androidx.work:work-runtime-ktx:2.12.0")
 
     val media3 = "1.5.1"
     implementation("androidx.media3:media3-exoplayer:$media3")
@@ -97,11 +97,11 @@ dependencies {
     implementation("androidx.media3:media3-ui:$media3")
     implementation("androidx.media3:media3-session:$media3")
 
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-runtime:2.8.5")
+    implementation("androidx.room:room-ktx:2.8.5")
+    ksp("androidx.room:room-compiler:2.8.5")
 
-    implementation(platform("androidx.compose:compose-bom:2024.12.01"))
+    implementation(platform("androidx.compose:compose-bom:2026.09.00"))
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.activity:activity-compose:1.9.3")
@@ -111,8 +111,8 @@ dependencies {
     // Chromecast (Google Play Services লাগে)
     implementation("com.google.android.gms:play-services-cast-framework:22.0.0")
     implementation("androidx.mediarouter:mediarouter:1.7.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.appcompat:appcompat:1.8.0")
+    implementation("androidx.core:core-splashscreen:1.2.0")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20231013")   // JVM ইউনিট টেস্টে org.json (অ্যান্ড্রয়েডে বিল্ট-ইন)
