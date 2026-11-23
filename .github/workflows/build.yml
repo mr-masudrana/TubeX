@@ -21,7 +21,7 @@ jobs:
 
       # Gradle wrapper ছাড়াই কাজ করে: Gradle 8.9 নিজে ইনস্টল হবে
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: "8.9"
 
